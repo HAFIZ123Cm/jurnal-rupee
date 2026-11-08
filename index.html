@@ -343,8 +343,12 @@ body[data-tab="muzik"] .cyclebar{display:none}
 .mnow{font-family:var(--f-display);font-weight:600;font-size:1.15rem;overflow-wrap:anywhere}
 .mplayer audio{width:100%}
 .mctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.mloop{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:500}
-.mloop input{width:18px;height:18px;accent-color:var(--accent)}
+.mbtn{height:44px;min-width:44px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:600 .85rem/1 var(--f-body);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.mbtn.big{width:54px;height:54px;padding:0;background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-size:1.1rem}
+.mbtn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.mbtn:disabled{opacity:.45;cursor:not-allowed}
+.mrename{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px;flex:1;min-width:0}
+.mrename input{flex:1;min-width:0;padding:7px 9px}
 .mtracks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .mtrack{display:flex;align-items:center;gap:10px;padding:8px;border-radius:12px;background:var(--bg)}
 .mtrack.on{background:var(--accent-soft)}
@@ -434,10 +438,12 @@ body[data-tab="muzik"] .cyclebar{display:none}
       <p id="mNow" class="mnow"></p>
       <audio id="mAudio" controls preload="metadata"></audio>
       <div class="mctl">
-        <button type="button" id="mPrev" class="btn ghost small">⏮ Sebelum</button>
-        <button type="button" id="mNext" class="btn ghost small">Seterusnya ⏭</button>
-        <label class="mloop"><input type="checkbox" id="mLoop" checked> Ulang</label>
+        <button type="button" id="mPrev" class="mbtn" aria-label="Lagu sebelum">⏮</button>
+        <button type="button" id="mToggle" class="mbtn big" aria-label="Main atau jeda">▶</button>
+        <button type="button" id="mNext" class="mbtn wide">⏭ Seterusnya</button>
+        <button type="button" id="mRepeat" class="mbtn wide" aria-pressed="false">🔂 Ulang lagu ini</button>
       </div>
+      <p id="mMode" class="hint"></p>
     </section>
     <section class="panel">
       <div class="panel-head"><h2>Senarai lagu</h2><label for="mFile" class="btn primary small filebtn" style="color:var(--accent-ink)">+ Tambah lagu</label></div>
@@ -1403,9 +1409,11 @@ body[data-tab="muzik"] .cyclebar{display:none}
 // Music tab (PWA only): songs are picked from the phone and kept in IndexedDB on the device.
 (function(){
   var DB_NAME = "jurnalRupeeMedia", STORE = "tracks";
-  var tracks = [], cur = -1, confirmId = null, urlCache = {};
+  var tracks = [], cur = -1, confirmId = null, renameId = null, urlCache = {};
   var $ = function(id){ return document.getElementById(id); };
   var audio = $("mAudio");
+  var repeatOne = false;
+  try { repeatOne = localStorage.getItem("jurnalRupee.repeatOne") === "1"; } catch (e) {}
 
   function openDb(){
     return new Promise(function(res, rej){
@@ -1425,48 +1433,70 @@ body[data-tab="muzik"] .cyclebar{display:none}
     });
   }
   function load(){
+    var keep = tracks[cur] ? tracks[cur].id : null;
     return tx("readonly", function(s){ return s.getAll(); }).then(function(all){
       tracks = (all || []).sort(function(a, b){ return a.added - b.added; });
+      cur = keep ? tracks.findIndex(function(t){ return t.id === keep; }) : -1;
       render();
     }).catch(function(){ $("mList").innerHTML = '<div class="empty">Simpanan lagu tidak tersedia pada pelayar ini.</div>'; });
   }
   function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
   function fmtSize(b){ return b > 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.round(b / 1024) + " KB"; }
   function srcFor(t){ if (!urlCache[t.id]) urlCache[t.id] = URL.createObjectURL(t.blob); return urlCache[t.id]; }
+  function setMeta(){
+    var t = tracks[cur];
+    if (!t || !("mediaSession" in navigator)) return;
+    try { navigator.mediaSession.metadata = new MediaMetadata({title: t.name, artist: "Jurnal Rupee", artwork: [{src: "icons/icon-512.png", sizes: "512x512", type: "image/png"}]}); } catch (e) {}
+  }
 
   function render(){
-    var now = tracks[cur];
-    $("mNow").textContent = now ? now.name : "Pilih lagu untuk dimainkan";
+    var now = tracks[cur], playing = now && !audio.paused;
+    $("mNow").textContent = now ? now.name : (tracks.length ? "Tekan ▶ untuk mula" : "Belum ada lagu");
     $("mCount").textContent = tracks.length + " lagu";
     $("mPrev").disabled = $("mNext").disabled = tracks.length < 2;
+    $("mToggle").disabled = !tracks.length;
+    $("mToggle").textContent = playing ? "❚❚" : "▶";
+    $("mRepeat").setAttribute("aria-pressed", repeatOne ? "true" : "false");
+    $("mMode").textContent = repeatOne ? "Lagu ini akan diulang sampai anda tekan Seterusnya atau matikan ulang." : "Selepas lagu habis, lagu seterusnya dimainkan.";
     if (!tracks.length) {
       $("mList").innerHTML = '<div class="empty">Belum ada lagu. Tekan "Tambah lagu" dan pilih fail MP3 dari telefon anda.</div>';
       return;
     }
+    var hadFocus = document.activeElement && document.activeElement.id === "mRenameInput";
     $("mList").innerHTML = '<ul class="mtracks">' + tracks.map(function(t, i){
-      var act = confirmId === t.id
-        ? '<span class="confirm">Buang?</span><button type="button" class="link danger" data-m="del-yes" data-id="' + t.id + '">Ya</button><button type="button" class="link" data-m="del-no">Batal</button>'
-        : '<button type="button" class="link danger" data-m="del" data-id="' + t.id + '">Buang</button>';
+      var body, act;
+      if (renameId === t.id) {
+        body = '<form class="mrename" data-id="' + t.id + '"><input id="mRenameInput" type="text" maxlength="80" value="' + esc(t.name) + '" aria-label="Nama baru lagu"><button type="submit" class="btn primary small">Simpan</button><button type="button" class="link" data-m="ren-no">Batal</button></form>';
+        act = "";
+      } else {
+        body = '<div class="mmeta"><span class="mname">' + esc(t.name) + '</span><small>' + fmtSize(t.size || 0) + '</small></div>';
+        act = confirmId === t.id
+          ? '<span class="confirm">Buang?</span><button type="button" class="link danger" data-m="del-yes" data-id="' + t.id + '">Ya</button><button type="button" class="link" data-m="del-no">Batal</button>'
+          : '<button type="button" class="link" data-m="ren" data-id="' + t.id + '">Namakan</button><button type="button" class="link danger" data-m="del" data-id="' + t.id + '">Buang</button>';
+      }
       return '<li class="mtrack' + (i === cur ? " on" : "") + '">' +
-        '<button type="button" class="mplay" data-m="play" data-i="' + i + '" aria-label="Main ' + esc(t.name) + '">' + (i === cur && !audio.paused ? "❚❚" : "▶") + '</button>' +
-        '<div class="mmeta"><span class="mname">' + esc(t.name) + '</span><small>' + fmtSize(t.size || 0) + '</small></div>' +
-        '<div class="mact">' + act + '</div></li>';
+        '<button type="button" class="mplay" data-m="play" data-i="' + i + '" aria-label="Main ' + esc(t.name) + '">' + (i === cur && playing ? "❚❚" : "▶") + '</button>' +
+        body + (act ? '<div class="mact">' + act + '</div>' : "") + '</li>';
     }).join("") + '</ul>';
+    if (renameId && $("mRenameInput") && !hadFocus) { var inp = $("mRenameInput"); inp.focus(); inp.select(); }
+  }
+  function startTrack(i){
+    cur = i; audio.src = srcFor(tracks[i]); audio.play().catch(function(){}); setMeta(); render();
   }
   function play(i){
     if (!tracks[i]) return;
     if (i === cur) { if (audio.paused) audio.play().catch(function(){}); else audio.pause(); return; }
-    cur = i; audio.src = srcFor(tracks[i]); audio.play().catch(function(){});
-    if ("mediaSession" in navigator) {
-      try { navigator.mediaSession.metadata = new MediaMetadata({title: tracks[i].name, artist: "Jurnal Rupee", artwork: [{src: "icons/icon-512.png", sizes: "512x512", type: "image/png"}]}); } catch (e) {}
-    }
-    render();
+    startTrack(i);
   }
-  function step(d){ if (!tracks.length) return; play(((cur < 0 ? 0 : cur) + d + tracks.length) % tracks.length); }
+  function step(d){ if (!tracks.length) return; startTrack(((cur < 0 ? 0 : cur) + d + tracks.length) % tracks.length); }
 
   audio.addEventListener("play", render);
   audio.addEventListener("pause", render);
-  audio.addEventListener("ended", function(){ if ($("mLoop").checked && tracks.length === 1) { audio.currentTime = 0; audio.play().catch(function(){}); } else if ($("mLoop").checked || cur < tracks.length - 1) step(1); else render(); });
+  audio.addEventListener("ended", function(){
+    if (repeatOne) { audio.currentTime = 0; audio.play().catch(function(){}); }
+    else if (tracks.length > 1) step(1);
+    else render();
+  });
   if ("mediaSession" in navigator) {
     try {
       navigator.mediaSession.setActionHandler("nexttrack", function(){ step(1); });
@@ -1475,6 +1505,12 @@ body[data-tab="muzik"] .cyclebar{display:none}
   }
   $("mPrev").addEventListener("click", function(){ step(-1); });
   $("mNext").addEventListener("click", function(){ step(1); });
+  $("mToggle").addEventListener("click", function(){ if (cur < 0) { if (tracks.length) startTrack(0); } else play(cur); });
+  $("mRepeat").addEventListener("click", function(){
+    repeatOne = !repeatOne;
+    try { localStorage.setItem("jurnalRupee.repeatOne", repeatOne ? "1" : "0"); } catch (e) {}
+    render();
+  });
   $("mFile").addEventListener("change", function(ev){
     var files = Array.prototype.slice.call(ev.target.files || []);
     if (!files.length) return;
@@ -1486,21 +1522,31 @@ body[data-tab="muzik"] .cyclebar{display:none}
     }).then(load).catch(function(){ alert("Lagu tidak dapat disimpan. Ruang telefon mungkin penuh."); });
     ev.target.value = "";
   });
+  $("mList").addEventListener("submit", function(ev){
+    var f = ev.target.closest(".mrename"); if (!f) return;
+    ev.preventDefault();
+    var id = f.dataset.id, name = $("mRenameInput").value.trim();
+    var t = tracks.find(function(x){ return x.id === id; });
+    renameId = null;
+    if (!t || !name || name === t.name) { render(); return; }
+    t.name = name.slice(0, 80);
+    tx("readwrite", function(s){ s.put(t); }).then(function(){ if (tracks[cur] && tracks[cur].id === id) setMeta(); render(); })
+      .catch(function(){ load(); });
+  });
   $("mList").addEventListener("click", function(ev){
     var b = ev.target.closest("[data-m]"); if (!b) return;
     var a = b.dataset.m;
     if (a === "play") play(Number(b.dataset.i));
-    else if (a === "del") { confirmId = b.dataset.id; render(); }
+    else if (a === "ren") { renameId = b.dataset.id; confirmId = null; render(); }
+    else if (a === "ren-no") { renameId = null; render(); }
+    else if (a === "del") { confirmId = b.dataset.id; renameId = null; render(); }
     else if (a === "del-no") { confirmId = null; render(); }
     else if (a === "del-yes") {
-      var id = b.dataset.id, playing = tracks[cur] && tracks[cur].id === id;
-      if (playing) { audio.pause(); audio.removeAttribute("src"); cur = -1; }
+      var id = b.dataset.id;
+      if (tracks[cur] && tracks[cur].id === id) { audio.pause(); audio.removeAttribute("src"); cur = -1; }
       if (urlCache[id]) { URL.revokeObjectURL(urlCache[id]); delete urlCache[id]; }
       confirmId = null;
-      tx("readwrite", function(s){ s.delete(id); }).then(function(){
-        var keep = cur >= 0 ? tracks[cur].id : null;
-        return load().then(function(){ cur = keep ? tracks.findIndex(function(t){ return t.id === keep; }) : -1; render(); });
-      });
+      tx("readwrite", function(s){ s.delete(id); }).then(load);
     }
   });
   if (window.indexedDB) load(); else render();

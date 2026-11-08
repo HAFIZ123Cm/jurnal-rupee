@@ -65,10 +65,12 @@ bodyPart = mustReplace(bodyPart,
       <p id="mNow" class="mnow"></p>
       <audio id="mAudio" controls preload="metadata"></audio>
       <div class="mctl">
-        <button type="button" id="mPrev" class="btn ghost small">⏮ Sebelum</button>
-        <button type="button" id="mNext" class="btn ghost small">Seterusnya ⏭</button>
-        <label class="mloop"><input type="checkbox" id="mLoop" checked> Ulang</label>
+        <button type="button" id="mPrev" class="mbtn" aria-label="Lagu sebelum">⏮</button>
+        <button type="button" id="mToggle" class="mbtn big" aria-label="Main atau jeda">▶</button>
+        <button type="button" id="mNext" class="mbtn wide">⏭ Seterusnya</button>
+        <button type="button" id="mRepeat" class="mbtn wide" aria-pressed="false">🔂 Ulang lagu ini</button>
       </div>
+      <p id="mMode" class="hint"></p>
     </section>
     <section class="panel">
       <div class="panel-head"><h2>Senarai lagu</h2><label for="mFile" class="btn primary small filebtn" style="color:var(--accent-ink)">+ Tambah lagu</label></div>
@@ -126,8 +128,12 @@ body[data-tab="muzik"] .cyclebar{display:none}
 .mnow{font-family:var(--f-display);font-weight:600;font-size:1.15rem;overflow-wrap:anywhere}
 .mplayer audio{width:100%}
 .mctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.mloop{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:500}
-.mloop input{width:18px;height:18px;accent-color:var(--accent)}
+.mbtn{height:44px;min-width:44px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:600 .85rem/1 var(--f-body);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.mbtn.big{width:54px;height:54px;padding:0;background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-size:1.1rem}
+.mbtn[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+.mbtn:disabled{opacity:.45;cursor:not-allowed}
+.mrename{display:flex;flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px;flex:1;min-width:0}
+.mrename input{flex:1;min-width:0;padding:7px 9px}
 .mtracks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .mtrack{display:flex;align-items:center;gap:10px;padding:8px;border-radius:12px;background:var(--bg)}
 .mtrack.on{background:var(--accent-soft)}
