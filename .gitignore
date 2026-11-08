@@ -1,0 +1,4 @@
+# Never publish personal data
+*.json
+!manifest.webmanifest
+.claude/
