@@ -52,6 +52,40 @@ mainScript = mustReplace(mainScript,
         '<label for="importFile" class="btn ghost filebtn">Import fail data</label></div></div>';`,
   "setup import button");
 
+// Music tab (PWA only)
+mainScript = mustReplace(mainScript,
+  'var TABS = ["hari", "belanja", "bajet", "diet"];',
+  'var TABS = ["hari", "belanja", "bajet", "diet", "muzik"];',
+  "tabs list");
+bodyPart = mustReplace(bodyPart,
+  '  <div class="view two" data-view="bajet" hidden>',
+  `  <div class="view" data-view="muzik" hidden>
+    <section class="panel mplayer">
+      <div class="panel-head"><h2>Muzik</h2><span id="mCount" class="meta"></span></div>
+      <p id="mNow" class="mnow"></p>
+      <audio id="mAudio" controls preload="metadata"></audio>
+      <div class="mctl">
+        <button type="button" id="mPrev" class="btn ghost small">⏮ Sebelum</button>
+        <button type="button" id="mNext" class="btn ghost small">Seterusnya ⏭</button>
+        <label class="mloop"><input type="checkbox" id="mLoop" checked> Ulang</label>
+      </div>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Senarai lagu</h2><label for="mFile" class="btn primary small filebtn" style="color:var(--accent-ink)">+ Tambah lagu</label></div>
+      <input id="mFile" class="vh" type="file" accept="audio/*,.mp3,.m4a" multiple>
+      <div id="mList"></div>
+      <p class="hint">Lagu disimpan dalam telefon ini sahaja, tidak dimuat naik ke mana-mana. Muzik terus bermain bila anda tukar tab.</p>
+    </section>
+  </div>
+
+  <div class="view two" data-view="bajet" hidden>`,
+  "music view");
+bodyPart = mustReplace(bodyPart,
+  '<path d="M8 7.5c0-1.5 1-2 1-3.5M12 7.5c0-1.5 1-2 1-3.5M16 7.5c0-1.5 1-2 1-3.5"/></svg>Diet</button>',
+  `<path d="M8 7.5c0-1.5 1-2 1-3.5M12 7.5c0-1.5 1-2 1-3.5M16 7.5c0-1.5 1-2 1-3.5"/></svg>Diet</button>
+    <button type="button" class="tabbtn" data-action="tab" data-tab="muzik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>Muzik</button>`,
+  "music tab button");
+
 // Local storage instead of claude.ai db
 mainScript = mustReplace(mainScript,
   /  async function init\(\)\{[\s\S]*?\n  init\(\);/,
@@ -86,12 +120,29 @@ img{max-width:100%}
 [hidden]{display:none!important}
 .vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
 .filebtn{display:inline-flex;align-items:center;color:var(--ink);font-size:.8rem}
+.tabbar-in{grid-template-columns:repeat(5,minmax(0,1fr))}
+.tabbtn{font-size:.68rem}
+body[data-tab="muzik"] .cyclebar{display:none}
+.mnow{font-family:var(--f-display);font-weight:600;font-size:1.15rem;overflow-wrap:anywhere}
+.mplayer audio{width:100%}
+.mctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mloop{display:inline-flex;align-items:center;gap:6px;color:var(--ink);font-weight:500}
+.mloop input{width:18px;height:18px;accent-color:var(--accent)}
+.mtracks{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.mtrack{display:flex;align-items:center;gap:10px;padding:8px;border-radius:12px;background:var(--bg)}
+.mtrack.on{background:var(--accent-soft)}
+.mplay{width:38px;height:38px;flex:none;border-radius:50%;border:0;background:var(--accent);color:var(--accent-ink);font-size:.85rem;cursor:pointer}
+.mmeta{flex:1;min-width:0;display:flex;flex-direction:column}
+.mname{font-weight:600;overflow-wrap:anywhere}
+.mmeta small{color:var(--muted);font-size:.75rem}
+.mact{display:flex;gap:2px;align-items:center}
 </style>
 `;
 
 const localDb = fs.readFileSync(path.join(__dirname, "localdb.js"), "utf8");
+const musicJs = fs.readFileSync(path.join(__dirname, "music.js"), "utf8");
 const html = pwaHead + headPart + styleBlock + "\n" + extraStyle + "</head>\n<body>\n" + bodyPart +
-  "<script>\n" + localDb + "\n</script>\n" + mainScript + "\n" +
+  "<script>\n" + localDb + "\n</script>\n" + mainScript + "\n" + "<script>\n" + musicJs + "\n</script>\n" +
   `<script>
 (function(){
   var msg = function(t){ var p = document.getElementById("backupMsg"); if (p) p.textContent = t; var o = document.getElementById("toast"); o.textContent = t; o.hidden = false; setTimeout(function(){ o.hidden = true; }, 3000); };
