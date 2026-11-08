@@ -337,9 +337,38 @@ img{max-width:100%}
 [hidden]{display:none!important}
 .vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
 .filebtn{display:inline-flex;align-items:center;color:var(--ink);font-size:.8rem}
-.tabbar-in{grid-template-columns:repeat(5,minmax(0,1fr))}
-.tabbtn{font-size:.68rem}
-body[data-tab="muzik"] .cyclebar{display:none}
+.tabbar-in{grid-template-columns:repeat(6,minmax(0,1fr))}
+.tabbtn{font-size:.64rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
+.jform{display:flex;flex-direction:column;gap:12px}
+.jrow{display:flex;align-items:center;gap:10px}
+.jrow input{width:auto;flex:1}
+.jlbl{font-size:.78rem;font-weight:600;color:var(--muted)}
+.jmoods{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.jmoods .chips label{font-size:1.35rem;padding:4px 10px;line-height:1.2}
+.jsupport{margin:0;padding:10px 12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);font-size:.85rem;line-height:1.5}
+.jweek{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
+.jday{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:10px;background:var(--bg)}
+.jday.now{outline:2px solid var(--accent-soft)}
+.jface{font-size:1.15rem;line-height:1.3}
+.jday small{color:var(--muted);font-size:.68rem}
+.jfilter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.jfilter .mbtn{height:36px;font-size:.8rem}
+.jfilter .mbtn span{color:var(--muted);font-weight:500}
+#jSearch{margin-bottom:12px}
+.jlist{display:flex;flex-direction:column;gap:8px}
+.jdate{margin:10px 0 0;font-size:.8rem;color:var(--muted);font-weight:600;text-transform:none}
+.jentry{padding:12px;border-radius:12px;background:var(--bg);border-left:4px solid var(--accent)}
+.jentry.k-luah{border-left-color:#C2669B}
+.jentry.k-syukur{border-left-color:#3E9E6B}
+.jhead{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted)}
+.jkind{font-weight:600;color:var(--ink)}
+.jmood{font-size:1rem}
+.jtime{margin-left:auto}
+.jtitle{margin:6px 0 0;font-size:1rem;font-family:var(--f-display)}
+.jtext{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
+.jtext.clip{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.jact{display:flex;gap:4px;justify-content:flex-end;align-items:center;margin-top:6px}
 .mnow{font-family:var(--f-display);font-weight:600;font-size:1.15rem;overflow-wrap:anywhere}
 .mplayer audio{width:100%}
 .mctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -432,6 +461,52 @@ body[data-tab="muzik"] .cyclebar{display:none}
 
   </div>
 
+  <div class="view" data-view="jurnal" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2 id="jFormTitle">Tulis hari ini</h2><span id="jStreak" class="meta"></span></div>
+      <form id="jForm" class="jform" novalidate>
+        <div class="chips" role="radiogroup" aria-label="Jenis catatan">
+          <input type="radio" name="jKind" id="jk1" value="belajar" checked><label for="jk1">📚 Belajar</label>
+          <input type="radio" name="jKind" id="jk2" value="luah"><label for="jk2">💭 Luahan</label>
+          <input type="radio" name="jKind" id="jk3" value="syukur"><label for="jk3">🌱 Syukur</label>
+        </div>
+        <div class="jrow">
+          <label class="jlbl" for="jDate">Tarikh</label><input id="jDate" type="date">
+        </div>
+        <fieldset class="jmoods"><legend class="jlbl">Perasaan saya</legend>
+          <div class="chips">
+            <input type="radio" name="jMood" id="jm1" value="1"><label for="jm1" title="Sangat sedih">😢</label>
+            <input type="radio" name="jMood" id="jm2" value="2"><label for="jm2" title="Sedih">😞</label>
+            <input type="radio" name="jMood" id="jm3" value="3"><label for="jm3" title="Biasa">😐</label>
+            <input type="radio" name="jMood" id="jm4" value="4"><label for="jm4" title="Baik">🙂</label>
+            <input type="radio" name="jMood" id="jm5" value="5"><label for="jm5" title="Gembira">😄</label>
+          </div>
+        </fieldset>
+        <input id="jTitle" type="text" maxlength="120" placeholder="Tajuk (pilihan)" aria-label="Tajuk">
+        <textarea id="jText" rows="7" aria-label="Catatan"></textarea>
+        <p id="jSupport" class="jsupport" hidden>Hari yang berat. Tak apa rasa begini. Kalau terlalu berat, bercakap dengan seseorang membantu: <b>Tele-MANAS 14416</b> (India, 24 jam, percuma) atau <b>Befrienders KL 03-7627 2929</b>, atau hubungi kawan dan keluarga.</p>
+        <p id="jErr" class="form-error" hidden></p>
+        <div class="form-actions">
+          <button type="submit" id="jSave" class="btn primary">Simpan</button>
+          <button type="button" id="jCancel" class="btn ghost" hidden>Batal</button>
+        </div>
+      </form>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Catatan saya</h2><span id="jCount" class="meta"></span></div>
+      <div id="jWeek" class="jweek" aria-label="Perasaan 7 hari"></div>
+      <div id="jFilter" class="jfilter">
+        <button type="button" class="mbtn" data-j="semua">Semua <span></span></button>
+        <button type="button" class="mbtn" data-j="belajar">📚 <span></span></button>
+        <button type="button" class="mbtn" data-j="luah">💭 <span></span></button>
+        <button type="button" class="mbtn" data-j="syukur">🌱 <span></span></button>
+      </div>
+      <input id="jSearch" type="search" placeholder="Cari catatan…" aria-label="Cari catatan">
+      <div id="jList" class="jlist"></div>
+      <p class="hint">Catatan disimpan dalam telefon ini sahaja dan ikut sekali dalam Eksport sandaran.</p>
+    </section>
+  </div>
+
   <div class="view" data-view="muzik" hidden>
     <section class="panel mplayer">
       <div class="panel-head"><h2>Muzik</h2><span id="mCount" class="meta"></span></div>
@@ -474,6 +549,7 @@ body[data-tab="muzik"] .cyclebar{display:none}
     <button type="button" class="tabbtn" data-action="tab" data-tab="belanja"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Belanja</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="bajet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 3.1A9 9 0 1 0 20.9 13H11z"/><path d="M14 3.2a9 9 0 0 1 6.8 6.8H14z"/></svg>Bajet</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="diet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 7.5c0-1.5 1-2 1-3.5M12 7.5c0-1.5 1-2 1-3.5M16 7.5c0-1.5 1-2 1-3.5"/></svg>Diet</button>
+    <button type="button" class="tabbtn" data-action="tab" data-tab="jurnal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 8h6M9 11.5h4"/></svg>Jurnal</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="muzik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>Muzik</button>
   </div>
 </nav>
@@ -851,7 +927,7 @@ body[data-tab="muzik"] .cyclebar{display:none}
   }
 
   /* ---------- tabs ---------- */
-  var TABS = ["hari", "belanja", "bajet", "diet", "muzik"];
+  var TABS = ["hari", "belanja", "bajet", "diet", "jurnal", "muzik"];
   function showTab(t){
     if (TABS.indexOf(t) < 0) t = "hari";
     document.body.dataset.tab = t;
@@ -1550,6 +1626,163 @@ body[data-tab="muzik"] .cyclebar{display:none}
     }
   });
   if (window.indexedDB) load(); else render();
+})();
+
+</script>
+<script>
+// Journal tab (PWA only): what I learned, venting, gratitude. Stored in LocalDB as jurnal/<id>,
+// so it is included in Tetapan → Eksport sandaran.
+(function(){
+  var db = window.LocalDB, col = db.collection("jurnal");
+  var $ = function(id){ return document.getElementById(id); };
+  var KINDS = {
+    belajar: {label: "Belajar", icon: "📚", ph: "Apa yang saya belajar hari ini? Satu fakta, satu konsep, atau satu pengajaran hidup…"},
+    luah: {label: "Luahan", icon: "💭", ph: "Tulis apa saja yang terbuku. Tiada siapa yang baca kecuali anda."},
+    syukur: {label: "Syukur", icon: "🌱", ph: "Tiga perkara kecil yang saya syukuri hari ini…"}
+  };
+  var MOODS = [["1", "😢", "Sangat sedih"], ["2", "😞", "Sedih"], ["3", "😐", "Biasa"], ["4", "🙂", "Baik"], ["5", "😄", "Gembira"]];
+  var entries = [], filter = "semua", editing = null, confirmId = null, open = {};
+
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function today(){ var d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); }
+  function fmtDate(iso){
+    var d = new Date(iso + "T00:00:00"), t = today(), y = new Date(Date.now() - 864e5);
+    y.setMinutes(y.getMinutes() - y.getTimezoneOffset());
+    if (iso === t) return "Hari ini";
+    if (iso === y.toISOString().slice(0, 10)) return "Semalam";
+    return d.toLocaleDateString("ms-MY", {weekday: "long", day: "numeric", month: "long", year: "numeric"});
+  }
+  function fmtTime(ms){ return new Date(ms).toLocaleTimeString("ms-MY", {hour: "2-digit", minute: "2-digit"}); }
+  function moodOf(v){ return MOODS.filter(function(m){ return m[0] === String(v); })[0]; }
+  function checked(name){ var el = document.querySelector('input[name="' + name + '"]:checked'); return el ? el.value : ""; }
+
+  // ---- compose form ----
+  function setKind(k){
+    var el = document.querySelector('input[name="jKind"][value="' + k + '"]'); if (el) el.checked = true;
+    $("jText").placeholder = KINDS[k].ph;
+  }
+  function resetForm(){
+    editing = null;
+    $("jForm").reset(); $("jDate").value = today(); setKind("belajar");
+    $("jSave").textContent = "Simpan"; $("jCancel").hidden = true; $("jFormTitle").textContent = "Tulis hari ini";
+    $("jErr").hidden = true; supportNote();
+  }
+  function supportNote(){
+    var m = checked("jMood");
+    $("jSupport").hidden = !(m === "1" || m === "2");
+  }
+  $("jForm").addEventListener("change", function(ev){
+    if (ev.target.name === "jKind") $("jText").placeholder = KINDS[ev.target.value].ph;
+    if (ev.target.name === "jMood") supportNote();
+  });
+  $("jForm").addEventListener("submit", function(ev){
+    ev.preventDefault();
+    var text = $("jText").value.trim();
+    if (!text) { $("jErr").textContent = "Tulis sesuatu dulu."; $("jErr").hidden = false; $("jText").focus(); return; }
+    var now = Date.now(), prev = editing && entries.filter(function(e){ return e.id === editing; })[0];
+    var data = {
+      date: $("jDate").value || today(), kind: checked("jKind") || "belajar", mood: checked("jMood") || null,
+      title: $("jTitle").value.trim().slice(0, 120), text: text.slice(0, 20000),
+      createdAt: prev ? prev.createdAt : now, updatedAt: now
+    };
+    var ref = editing ? col.doc(editing) : col.doc("j" + now.toString(36) + Math.random().toString(36).slice(2, 6));
+    var wasEdit = !!editing;
+    ref.set(data).then(function(){
+      resetForm(); toast(wasEdit ? "Catatan dikemas kini." : "Catatan disimpan.");
+    }).catch(function(){ $("jErr").textContent = "Tidak dapat simpan. Ruang telefon mungkin penuh."; $("jErr").hidden = false; });
+  });
+  $("jCancel").addEventListener("click", resetForm);
+
+  function toast(t){ var o = $("toast"); if (!o) return; o.textContent = t; o.hidden = false; setTimeout(function(){ o.hidden = true; }, 2500); }
+
+  // ---- list ----
+  function streak(){
+    var days = {}; entries.forEach(function(e){ days[e.date] = true; });
+    var n = 0, d = new Date();
+    if (!days[today()]) d.setDate(d.getDate() - 1);
+    for (;;) {
+      var x = new Date(d); x.setMinutes(x.getMinutes() - x.getTimezoneOffset());
+      if (!days[x.toISOString().slice(0, 10)]) break;
+      n++; d.setDate(d.getDate() - 1);
+    }
+    return n;
+  }
+  function week(){
+    var out = [];
+    for (var i = 6; i >= 0; i--) {
+      var d = new Date(Date.now() - i * 864e5); d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+      var iso = d.toISOString().slice(0, 10);
+      var day = entries.filter(function(e){ return e.date === iso; });
+      var moods = day.map(function(e){ return Number(e.mood); }).filter(Boolean);
+      var avg = moods.length ? Math.round(moods.reduce(function(a, b){ return a + b; }, 0) / moods.length) : 0;
+      out.push('<div class="jday' + (iso === today() ? " now" : "") + '"><span class="jface">' + (avg ? moodOf(avg)[1] : (day.length ? "✍️" : "·")) + '</span><small>' +
+        new Date(iso + "T00:00:00").toLocaleDateString("ms-MY", {weekday: "short"}).slice(0, 3) + '</small></div>');
+    }
+    return out.join("");
+  }
+  function render(){
+    var n = streak();
+    $("jCount").textContent = entries.length + " catatan";
+    $("jStreak").textContent = n ? "🔥 " + n + " hari berturut-turut" : "Mula tulis hari ini";
+    $("jWeek").innerHTML = week();
+    var counts = {semua: entries.length};
+    Object.keys(KINDS).forEach(function(k){ counts[k] = entries.filter(function(e){ return e.kind === k; }).length; });
+    Array.prototype.forEach.call(document.querySelectorAll("#jFilter [data-j]"), function(b){
+      var k = b.dataset.j; b.setAttribute("aria-pressed", k === filter ? "true" : "false");
+      b.querySelector("span").textContent = counts[k] || 0;
+    });
+    var q = ($("jSearch").value || "").trim().toLowerCase();
+    var list = entries.filter(function(e){
+      return (filter === "semua" || e.kind === filter) && (!q || (e.title + " " + e.text).toLowerCase().indexOf(q) >= 0);
+    });
+    if (!entries.length) { $("jList").innerHTML = '<div class="empty">Belum ada catatan. Tulis satu perkara yang anda belajar hari ini, walaupun satu ayat.</div>'; return; }
+    if (!list.length) { $("jList").innerHTML = '<div class="empty">Tiada catatan yang sepadan.</div>'; return; }
+    var html = "", lastDate = null;
+    list.forEach(function(e){
+      if (e.date !== lastDate) { html += '<h3 class="jdate">' + esc(fmtDate(e.date)) + '</h3>'; lastDate = e.date; }
+      var k = KINDS[e.kind] || KINDS.belajar, m = moodOf(e.mood), long = e.text.length > 280, isOpen = open[e.id] || !long;
+      var acts = confirmId === e.id
+        ? '<span class="confirm">Padam catatan ini?</span><button type="button" class="link danger" data-ja="del-yes" data-id="' + e.id + '">Ya, padam</button><button type="button" class="link" data-ja="del-no">Batal</button>'
+        : '<button type="button" class="link" data-ja="edit" data-id="' + e.id + '">Sunting</button><button type="button" class="link danger" data-ja="del" data-id="' + e.id + '">Padam</button>';
+      html += '<article class="jentry k-' + esc(e.kind) + '">' +
+        '<div class="jhead"><span class="jkind">' + k.icon + " " + k.label + '</span>' + (m ? '<span class="jmood" title="' + m[2] + '">' + m[1] + '</span>' : "") +
+        '<span class="jtime">' + fmtTime(e.createdAt) + '</span></div>' +
+        (e.title ? '<h4 class="jtitle">' + esc(e.title) + '</h4>' : "") +
+        '<p class="jtext' + (isOpen ? "" : " clip") + '">' + esc(e.text) + '</p>' +
+        (long ? '<button type="button" class="link" data-ja="more" data-id="' + e.id + '">' + (isOpen ? "Tutup" : "Baca semua") + '</button>' : "") +
+        '<div class="jact">' + acts + '</div></article>';
+    });
+    $("jList").innerHTML = html;
+  }
+  $("jFilter").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-j]"); if (!b) return;
+    filter = b.dataset.j; render();
+  });
+  $("jSearch").addEventListener("input", render);
+  $("jList").addEventListener("click", function(ev){
+    var b = ev.target.closest("[data-ja]"); if (!b) return;
+    var a = b.dataset.ja, id = b.dataset.id;
+    if (a === "more") { open[id] = !open[id]; render(); }
+    else if (a === "del") { confirmId = id; render(); }
+    else if (a === "del-no") { confirmId = null; render(); }
+    else if (a === "del-yes") { confirmId = null; if (editing === id) resetForm(); col.doc(id).delete(); }
+    else if (a === "edit") {
+      var e = entries.filter(function(x){ return x.id === id; })[0]; if (!e) return;
+      editing = id; confirmId = null;
+      $("jDate").value = e.date; $("jTitle").value = e.title || ""; $("jText").value = e.text; setKind(e.kind || "belajar");
+      Array.prototype.forEach.call(document.querySelectorAll('input[name="jMood"]'), function(r){ r.checked = r.value === String(e.mood); });
+      $("jSave").textContent = "Simpan perubahan"; $("jCancel").hidden = false; $("jFormTitle").textContent = "Sunting catatan";
+      supportNote(); render();
+      $("jForm").scrollIntoView({behavior: "smooth", block: "start"}); $("jText").focus();
+    }
+  });
+
+  col.onSnapshot(function(snap){
+    entries = snap.docs.map(function(d){ var x = d.data(); x.id = d.id; return x; })
+      .sort(function(a, b){ return a.date === b.date ? b.createdAt - a.createdAt : (a.date < b.date ? 1 : -1); });
+    render();
+  });
+  resetForm();
 })();
 
 </script>

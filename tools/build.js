@@ -55,11 +55,57 @@ mainScript = mustReplace(mainScript,
 // Music tab (PWA only)
 mainScript = mustReplace(mainScript,
   'var TABS = ["hari", "belanja", "bajet", "diet"];',
-  'var TABS = ["hari", "belanja", "bajet", "diet", "muzik"];',
+  'var TABS = ["hari", "belanja", "bajet", "diet", "jurnal", "muzik"];',
   "tabs list");
 bodyPart = mustReplace(bodyPart,
   '  <div class="view two" data-view="bajet" hidden>',
-  `  <div class="view" data-view="muzik" hidden>
+  `  <div class="view" data-view="jurnal" hidden>
+    <section class="panel">
+      <div class="panel-head"><h2 id="jFormTitle">Tulis hari ini</h2><span id="jStreak" class="meta"></span></div>
+      <form id="jForm" class="jform" novalidate>
+        <div class="chips" role="radiogroup" aria-label="Jenis catatan">
+          <input type="radio" name="jKind" id="jk1" value="belajar" checked><label for="jk1">📚 Belajar</label>
+          <input type="radio" name="jKind" id="jk2" value="luah"><label for="jk2">💭 Luahan</label>
+          <input type="radio" name="jKind" id="jk3" value="syukur"><label for="jk3">🌱 Syukur</label>
+        </div>
+        <div class="jrow">
+          <label class="jlbl" for="jDate">Tarikh</label><input id="jDate" type="date">
+        </div>
+        <fieldset class="jmoods"><legend class="jlbl">Perasaan saya</legend>
+          <div class="chips">
+            <input type="radio" name="jMood" id="jm1" value="1"><label for="jm1" title="Sangat sedih">😢</label>
+            <input type="radio" name="jMood" id="jm2" value="2"><label for="jm2" title="Sedih">😞</label>
+            <input type="radio" name="jMood" id="jm3" value="3"><label for="jm3" title="Biasa">😐</label>
+            <input type="radio" name="jMood" id="jm4" value="4"><label for="jm4" title="Baik">🙂</label>
+            <input type="radio" name="jMood" id="jm5" value="5"><label for="jm5" title="Gembira">😄</label>
+          </div>
+        </fieldset>
+        <input id="jTitle" type="text" maxlength="120" placeholder="Tajuk (pilihan)" aria-label="Tajuk">
+        <textarea id="jText" rows="7" aria-label="Catatan"></textarea>
+        <p id="jSupport" class="jsupport" hidden>Hari yang berat. Tak apa rasa begini. Kalau terlalu berat, bercakap dengan seseorang membantu: <b>Tele-MANAS 14416</b> (India, 24 jam, percuma) atau <b>Befrienders KL 03-7627 2929</b>, atau hubungi kawan dan keluarga.</p>
+        <p id="jErr" class="form-error" hidden></p>
+        <div class="form-actions">
+          <button type="submit" id="jSave" class="btn primary">Simpan</button>
+          <button type="button" id="jCancel" class="btn ghost" hidden>Batal</button>
+        </div>
+      </form>
+    </section>
+    <section class="panel">
+      <div class="panel-head"><h2>Catatan saya</h2><span id="jCount" class="meta"></span></div>
+      <div id="jWeek" class="jweek" aria-label="Perasaan 7 hari"></div>
+      <div id="jFilter" class="jfilter">
+        <button type="button" class="mbtn" data-j="semua">Semua <span></span></button>
+        <button type="button" class="mbtn" data-j="belajar">📚 <span></span></button>
+        <button type="button" class="mbtn" data-j="luah">💭 <span></span></button>
+        <button type="button" class="mbtn" data-j="syukur">🌱 <span></span></button>
+      </div>
+      <input id="jSearch" type="search" placeholder="Cari catatan…" aria-label="Cari catatan">
+      <div id="jList" class="jlist"></div>
+      <p class="hint">Catatan disimpan dalam telefon ini sahaja dan ikut sekali dalam Eksport sandaran.</p>
+    </section>
+  </div>
+
+  <div class="view" data-view="muzik" hidden>
     <section class="panel mplayer">
       <div class="panel-head"><h2>Muzik</h2><span id="mCount" class="meta"></span></div>
       <p id="mNow" class="mnow"></p>
@@ -85,6 +131,7 @@ bodyPart = mustReplace(bodyPart,
 bodyPart = mustReplace(bodyPart,
   '<path d="M8 7.5c0-1.5 1-2 1-3.5M12 7.5c0-1.5 1-2 1-3.5M16 7.5c0-1.5 1-2 1-3.5"/></svg>Diet</button>',
   `<path d="M8 7.5c0-1.5 1-2 1-3.5M12 7.5c0-1.5 1-2 1-3.5M16 7.5c0-1.5 1-2 1-3.5"/></svg>Diet</button>
+    <button type="button" class="tabbtn" data-action="tab" data-tab="jurnal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 8h6M9 11.5h4"/></svg>Jurnal</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="muzik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>Muzik</button>`,
   "music tab button");
 
@@ -122,9 +169,38 @@ img{max-width:100%}
 [hidden]{display:none!important}
 .vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
 .filebtn{display:inline-flex;align-items:center;color:var(--ink);font-size:.8rem}
-.tabbar-in{grid-template-columns:repeat(5,minmax(0,1fr))}
-.tabbtn{font-size:.68rem}
-body[data-tab="muzik"] .cyclebar{display:none}
+.tabbar-in{grid-template-columns:repeat(6,minmax(0,1fr))}
+.tabbtn{font-size:.64rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
+.jform{display:flex;flex-direction:column;gap:12px}
+.jrow{display:flex;align-items:center;gap:10px}
+.jrow input{width:auto;flex:1}
+.jlbl{font-size:.78rem;font-weight:600;color:var(--muted)}
+.jmoods{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.jmoods .chips label{font-size:1.35rem;padding:4px 10px;line-height:1.2}
+.jsupport{margin:0;padding:10px 12px;border-radius:10px;background:var(--accent-soft);color:var(--ink);font-size:.85rem;line-height:1.5}
+.jweek{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:12px}
+.jday{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:10px;background:var(--bg)}
+.jday.now{outline:2px solid var(--accent-soft)}
+.jface{font-size:1.15rem;line-height:1.3}
+.jday small{color:var(--muted);font-size:.68rem}
+.jfilter{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.jfilter .mbtn{height:36px;font-size:.8rem}
+.jfilter .mbtn span{color:var(--muted);font-weight:500}
+#jSearch{margin-bottom:12px}
+.jlist{display:flex;flex-direction:column;gap:8px}
+.jdate{margin:10px 0 0;font-size:.8rem;color:var(--muted);font-weight:600;text-transform:none}
+.jentry{padding:12px;border-radius:12px;background:var(--bg);border-left:4px solid var(--accent)}
+.jentry.k-luah{border-left-color:#C2669B}
+.jentry.k-syukur{border-left-color:#3E9E6B}
+.jhead{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted)}
+.jkind{font-weight:600;color:var(--ink)}
+.jmood{font-size:1rem}
+.jtime{margin-left:auto}
+.jtitle{margin:6px 0 0;font-size:1rem;font-family:var(--f-display)}
+.jtext{margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.55}
+.jtext.clip{display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.jact{display:flex;gap:4px;justify-content:flex-end;align-items:center;margin-top:6px}
 .mnow{font-family:var(--f-display);font-weight:600;font-size:1.15rem;overflow-wrap:anywhere}
 .mplayer audio{width:100%}
 .mctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -147,8 +223,10 @@ body[data-tab="muzik"] .cyclebar{display:none}
 
 const localDb = fs.readFileSync(path.join(__dirname, "localdb.js"), "utf8");
 const musicJs = fs.readFileSync(path.join(__dirname, "music.js"), "utf8");
+const journalJs = fs.readFileSync(path.join(__dirname, "journal.js"), "utf8");
 const html = pwaHead + headPart + styleBlock + "\n" + extraStyle + "</head>\n<body>\n" + bodyPart +
   "<script>\n" + localDb + "\n</script>\n" + mainScript + "\n" + "<script>\n" + musicJs + "\n</script>\n" +
+  "<script>\n" + journalJs + "\n</script>\n" +
   `<script>
 (function(){
   var msg = function(t){ var p = document.getElementById("backupMsg"); if (p) p.textContent = t; var o = document.getElementById("toast"); o.textContent = t; o.hidden = false; setTimeout(function(){ o.hidden = true; }, 3000); };
