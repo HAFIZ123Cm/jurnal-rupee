@@ -991,16 +991,17 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
         {s:"Rehatkan ayam atas pinggan sebelum potong supaya jus tak keluar.", t:3, done:"Siap! Selamat makan."}
       ],
       note:"Kenapa luar pucat dulu: ayam basah, suhu 190°C terlalu rendah, dan tiada minyak di permukaan. Tepung jagung + 200°C + lap kering betulkan semua."},
-    {name:"Ayam Tandoori", meta:"200°C · 15 min · +₹10",
-      marinade:["2 sudu besar dadih (curd) pekat, toskan airnya","1 sudu teh serbuk cili Kashmiri","¼ sudu teh kunyit","½ sudu teh garam masala","1 sudu teh pes halia & bawang putih","Perahan ½ biji lemon, garam secukup rasa","1 sudu teh minyak"],
+    {name:"Ayam Madu", meta:"180°C · 15 min · +₹8", isNew:"Baru",
+      marinade:["1 sudu besar kicap (soy sauce)","1 sudu besar madu (Dabur pun boleh)","2 ulas bawang putih, cincang","½ sudu teh halia parut atau pes halia","½ sudu teh lada hitam","½ sudu teh serbuk cili Kashmiri (pilihan, untuk pedas sikit)","1 sudu teh minyak"],
       steps:[
-        {s:"Gaul semua bahan perap dengan 160 g dada ayam. Perap sekurang-kurangnya 30 minit (paling sedap semalaman dalam peti sejuk).", t:30, done:"Perapan siap. Panaskan air fryer."},
-        PREHEAT,
-        {s:"Kikis lebihan dadih (lapisan nipis saja, tebal = pucat). Susun satu lapis. Masak 200°C.", t:8, done:"Terbalikkan ayam dan sapu sedikit minyak."},
-        {s:"Terbalikkan, sapu minyak. Masak lagi 200°C sampai tepi ada kesan hangit sikit.", t:7, done:"Semak warna. Rehatkan ayam."},
-        {s:"Rehatkan, kemudian hidang dengan bawang merah hiris dan lemon.", t:3, done:"Siap! Selamat makan."}
+        "Gaul semua bahan perap. Asingkan 1 sudu besar perapan dalam cawan kecil untuk disapu nanti.",
+        {s:"Lap ayam kering, gaul dengan perapan selebihnya. Perap.", t:20, done:"Perapan siap. Panaskan air fryer."},
+        {s:"Panaskan air fryer kosong 180°C. (Madu cepat hangit, jadi jangan guna 200°C.)", t:4, done:"Masukkan ayam."},
+        {s:"Lap lebihan perapan, susun satu lapis. Masak 180°C.", t:8, done:"Terbalikkan ayam dan sapu perapan yang diasingkan."},
+        {s:"Terbalikkan, sapu perapan yang diasingkan. Masak lagi 180°C sampai berkilat dan perang gelap di tepi.", t:6, done:"Rehatkan ayam."},
+        {s:"Rehatkan sebelum potong. Tabur bijan kalau ada.", t:3, done:"Siap! Selamat makan."}
       ],
-      note:"Dadih buat ayam lembut dan tambah ~2 g protein. Ini pilihan paling 'macam kedai'."},
+      note:"Manis masin macam ayam madu kedai. Sedap dengan nasi panas, timun dan Sos Cili Kicap."},
     {name:"Ayam Lada Hitam", meta:"190°C · 16 min · +₹5",
       marinade:["1 sudu besar kicap","1 sudu teh lada hitam kasar","2 ulas bawang putih cincang","½ sudu teh gula atau madu","1 sudu teh minyak"],
       steps:[
@@ -1012,27 +1013,28 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
         {s:"Rehatkan sebelum potong.", t:3, done:"Siap! Selamat makan."}
       ],
       note:"Rasa 'restoran' tanpa kuah. Tambah bawang besar dalam bakul untuk 5 minit terakhir."},
-    {name:"Ayam Peri-Peri", meta:"200°C · 14 min · +₹6",
-      marinade:["1 sudu teh cili flakes","1 sudu teh serbuk cili Kashmiri atau paprika","½ sudu teh serbuk bawang putih","½ sudu teh oregano","Jus ½ lemon, garam","1 sudu teh minyak"],
+    {name:"Ayam Masak Merah (versi air fryer)", meta:"190°C · 15 min · +₹6", isNew:"Baru",
+      marinade:["Perap: ½ sudu teh kunyit, ½ sudu teh garam, 1 sudu teh minyak","Sos merah: 2 sudu besar sos tomato (Kissan/Maggi ketchup)","1 sudu teh serbuk cili Kashmiri (beri warna merah tanpa cili merah)","1 ulas bawang putih, cincang","½ sudu teh gula, perahan sedikit limau","¼ biji bawang besar, hiris (pilihan)"],
       steps:[
-        {s:"Lap ayam kering, kemudian perap.", t:20, done:"Perapan siap. Panaskan air fryer."},
+        {s:"Lap ayam kering, perap dengan kunyit, garam dan minyak.", t:15, done:"Perapan siap. Panaskan air fryer."},
+        "Sementara tunggu, gaul semua bahan sos merah dalam mangkuk kecil.",
+        {s:"Panaskan air fryer kosong 190°C.", t:4, done:"Masukkan ayam."},
+        {s:"Susun ayam satu lapis. Masak 190°C.", t:8, done:"Terbalikkan ayam, sapu tebal sos merah, letak bawang di tepi."},
+        {s:"Terbalikkan, sapu sos merah tebal-tebal di atas. Masukkan bawang hiris di tepi. Masak lagi 190°C.", t:5, done:"Sapu baki sos lagi sekali."},
+        {s:"Sapu baki sos. Masak 2 minit lagi sampai sos melekat dan berkilat.", t:2, done:"Rehatkan ayam."},
+        {s:"Rehatkan sebelum potong.", t:3, done:"Siap! Selamat makan."}
+      ],
+      note:"Rasa masam manis pedas macam masak merah kenduri, tanpa kuali dan tanpa banyak minyak."},
+    {name:"Ayam Panggang Herba (gaya Western)", meta:"200°C · 14 min · +₹5", isNew:"Baru",
+      marinade:["3 ulas bawang putih, cincang halus","1 sudu teh oregano atau 'pizza seasoning' (paket kecil pun boleh)","½ sudu teh cili flakes","½ sudu teh lada hitam","Perahan ½ biji lemon, ½ sudu teh garam","1 sudu teh minyak atau mentega (Amul)"],
+      steps:[
+        {s:"Lap ayam kering, gaul dengan semua bahan. Perap.", t:20, done:"Perapan siap. Panaskan air fryer."},
         PREHEAT,
         {s:"Susun satu lapis. Masak 200°C.", t:8, done:"Terbalikkan ayam."},
         {s:"Terbalikkan. Masak lagi 200°C.", t:6, done:"Semak warna. Rehatkan ayam."},
         {s:"Rehatkan, kemudian perah lemon lagi.", t:3, done:"Siap! Selamat makan."}
       ],
-      note:"Pedas masam. Bagus kalau dah bosan rasa kari."},
-    {name:"Ayam Chettinad Kering", meta:"200°C · 15 min · +₹5",
-      marinade:["1 sudu teh lada hitam","½ sudu teh jintan putih","½ sudu teh serbuk ketumbar","1 sudu teh serbuk cili, ¼ sudu teh kunyit","1 sudu teh pes halia & bawang putih","Garam, 1 sudu teh minyak, daun kari (jika ada)"],
-      steps:[
-        "Sangai rempah kering 1 minit di kuali (pilihan, lebih wangi).",
-        {s:"Lap ayam kering, kemudian perap.", t:20, done:"Perapan siap. Panaskan air fryer."},
-        PREHEAT,
-        {s:"Susun satu lapis. Masak 200°C.", t:9, done:"Terbalikkan ayam."},
-        {s:"Terbalikkan. Masak lagi 200°C.", t:6, done:"Semak warna. Rehatkan ayam."},
-        {s:"Rehatkan sebelum potong.", t:3, done:"Siap! Selamat makan."}
-      ],
-      note:"Berempah dan pedas, sesuai ganti kuah Kerala."}
+      note:"Rasa macam chicken chop kedai Western. Hidang dengan Sos Yogurt Bawang Putih, kentang rebus atau roti."}
   ];
   var TIPS = [
     "Luar pucat tapi dalam masak? Lap ayam sangat kering, panaskan air fryer dulu, guna 200°C, dan sapu sedikit minyak di permukaan. Jangan susun bertindih.",
@@ -1062,19 +1064,19 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
   /* ---------- small sauces ---------- */
   var SAUCES = [
     {name:"Sos Cili Kicap", tag:"Paling senang", kcal:15, cost:"₹2", time:"1 min", pair:"Ayam Kunyit, Ayam Lada Hitam",
-      ing:["1 sudu besar kicap (soy sauce)","1–2 cili hijau atau cili padi, hiris halus","1 ulas bawang putih, cincang","Perahan ½ biji limau nipis atau lemon","½ sudu teh gula (pilihan)"],
+      ing:["1 sudu besar kicap (soy sauce)","1–2 cili hijau (hari mirch), hiris halus","1 ulas bawang putih, cincang","Perahan ½ biji limau nipis atau lemon","½ sudu teh gula (pilihan)"],
       steps:["Gaul semua dalam mangkuk kecil.","Biar 5 minit supaya pedas cili dan bawang putih keluar."],
       keep:"Buat baru setiap kali. Rasa macam sos cili kicap kedai mamak."},
-    {name:"Hari Chutney (chutney hijau)", tag:"Paling murah sebulan", serves:5, kcal:10, cost:"₹3", time:"5 min", pair:"Ayam Tandoori, Ayam Chettinad",
-      ing:["1 ikat kecil daun ketumbar (₹10), batang sekali","10–15 helai daun pudina","1–2 cili hijau","1 cm halia","Perahan ½ biji lemon, garam","2–3 sudu besar air sejuk"],
-      steps:["Basuh daun, masukkan semua dalam pengisar.","Kisar sampai licin. Tambah air sedikit demi sedikit kalau terlalu pekat.","Rasa: tambah lemon kalau kurang masam, garam kalau kurang masin."],
-      keep:"Satu batch cukup 5 hidangan. Peti sejuk 3 hari dalam bekas bertutup, atau beku dalam bekas ais (ice tray) sampai 1 bulan: keluarkan 1 kiub setiap kali makan."},
-    {name:"Sos Yogurt Bawang Putih (gaya shawarma)", tag:"Ada protein", kcal:45, cost:"₹6", time:"5 min + 1 jam tos", pair:"Ayam Peri-Peri, Ayam Tandoori",
+    {name:"Sambal Kicap Madu", tag:"Rasa Malaysia", serves:3, kcal:35, cost:"₹4", time:"3 min", pair:"Ayam Kunyit, Ayam Madu, Ayam Lada Hitam",
+      ing:["3 sudu besar kicap (soy sauce, contoh Ching's)","1 sudu besar madu","2–3 cili hijau, hiris halus","2 ulas bawang putih, cincang halus","½ sudu teh serbuk cili Kashmiri (warna merah)","Perahan ½ biji limau nipis (nimbu)","1 sudu besar air panas"],
+      steps:["Larutkan madu dalam air panas.","Masukkan kicap, cili hijau, bawang putih, serbuk cili dan limau. Gaul.","Biar 10 minit supaya pedas dan bawang putih meresap. Rasa: tambah limau kalau terlalu manis."],
+      keep:"Satu batch cukup 3 hidangan. Simpan dalam bekas bertutup dalam peti sejuk sampai 5 hari. Makin lama makin sedap."},
+    {name:"Sos Yogurt Bawang Putih (gaya shawarma)", tag:"Ada protein", kcal:45, cost:"₹6", time:"5 min + 1 jam tos", pair:"Ayam Panggang Herba, Ayam Kunyit",
       ing:["4 sudu besar dadih (curd), ditos jadi pekat","1 ulas bawang putih, parut halus","Perahan ¼ biji lemon","Secubit garam, lada hitam dan serbuk jintan","Daun pudina hiris (pilihan)"],
       steps:["Tos dadih: letak atas kain bersih atau tisu dalam penapis, simpan dalam peti sejuk 1 jam. Air keluar, dadih jadi pekat macam yogurt Greek.","Gaul dadih pekat dengan bawang putih, lemon, garam, lada hitam dan jintan.","Biar 10 minit supaya rasa bawang putih sebati."],
       keep:"Peti sejuk 3 hari. Tos 2–3 hidangan sekali gus untuk jimat masa."},
     {name:"Sambal Tomato Segar (gaya air asam)", tag:"Segar & masam", kcal:25, cost:"₹5", time:"5 min", pair:"Ayam Kunyit, nasi panas",
-      ing:["1 biji tomato kecil, potong dadu","¼ biji bawang besar, cincang halus","1 cili hijau atau merah, hiris","Perahan ½ biji limau nipis","1 sudu teh kicap, secubit garam dan gula","1 sudu teh air asam jawa (pilihan, lebih rasa air asam)"],
+      ing:["1 biji tomato kecil, potong dadu","¼ biji bawang besar, cincang halus","1 cili hijau, hiris (atau secubit cili flakes)","Perahan ½ biji limau nipis","1 sudu teh kicap, secubit garam dan gula","1 sudu teh air asam jawa (pilihan, lebih rasa air asam)"],
       steps:["Gaul tomato, bawang dan cili.","Masukkan limau, kicap, garam, gula dan air asam. Gaul dan rasa.","Biar 5 minit supaya tomato keluar air."],
       keep:"Buat baru setiap kali. Peti sejuk 1 hari saja."},
     {name:"Sos Kacang Ringan (gaya satay)", tag:"Sekali-sekala", kcal:100, cost:"₹8", time:"3 min", pair:"Ayam Kunyit, Ayam Lada Hitam",
@@ -1085,7 +1087,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
   function renderSauces(){
     var el = $("sauces"); if (!el) return;
     el.innerHTML = '<div class="panel-head"><h2>Sos kecil untuk ayam</h2><span class="meta">Sehidang = 2 sudu besar</span></div>' +
-      '<p class="hint">Sos buat ayam yang sama rasa lain setiap hari. Empat yang pertama di bawah 50 kcal, jadi pelan diet tak berubah.</p>' +
+      '<p class="hint">Sos buat ayam yang sama rasa lain setiap hari. Empat yang pertama di bawah 50 kcal, jadi pelan diet tak berubah. Semua bahan ada di kedai runcit India; cili merah segar tak diperlukan.</p>' +
       '<div class="recipes">' + SAUCES.map(function(r){
         return '<details class="recipe"><summary><span class="rname">' + esc(r.name) + ' <span class="rnew">' + esc(r.tag) + '</span></span><span class="rmeta">~' + r.kcal + ' kcal · ' + esc(r.cost) + ' · ' + esc(r.time) + '</span></summary>' +
           '<div class="rbody"><h4>Bahan (' + (r.serves || 1) + ' hidangan)</h4><ul>' + r.ing.map(function(m){ return '<li>' + esc(m) + '</li>'; }).join("") + '</ul>' +
