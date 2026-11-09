@@ -315,6 +315,24 @@ body[data-tab="hari"] .cyclebar,body[data-tab="diet"] .cyclebar{display:none}
 .rbody h4{margin:2px 0 0;font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
 .rbody ul,.rbody ol,.tips{margin:0;padding-left:1.25em;display:flex;flex-direction:column;gap:4px}
 .tips{font-size:.88rem}
+.rnew{display:inline-block;margin-left:4px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:.68rem;font-weight:600;vertical-align:2px}
+.rsteps li{line-height:1.5}
+.tbtn{display:inline-flex;align-items:center;gap:4px;margin:3px 0 2px;padding:5px 11px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);font:600 .78rem/1 var(--f-body);cursor:pointer;white-space:nowrap}
+.tbtn.on{background:var(--accent);color:var(--accent-ink)}
+.timerbar{position:fixed;left:12px;right:12px;bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:16;max-width:536px;margin:0 auto;background:var(--surface);border:1px solid var(--accent);border-radius:18px;padding:10px 12px 12px;box-shadow:var(--shadow);overflow:hidden}
+.timerbar.done{animation:tbflash 1s ease-in-out infinite alternate}
+@keyframes tbflash{from{border-color:var(--accent)}to{border-color:var(--over);box-shadow:0 0 0 3px var(--accent-soft)}}
+@media (prefers-reduced-motion:reduce){.timerbar.done{animation:none;border-color:var(--over)}}
+.tb-prog{position:absolute;left:0;right:0;top:0;height:4px;background:var(--accent-soft)}
+.tb-prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s linear}
+.tb-top{display:flex;align-items:center;gap:10px;margin-top:2px}
+.tb-txt{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;font-size:.84rem;line-height:1.35}
+.tb-txt small{color:var(--muted);font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.tb-time{font-family:var(--f-num);font-size:1.9rem;font-weight:700;font-variant-numeric:tabular-nums;color:var(--accent)}
+.timerbar.done .tb-time{color:var(--over)}
+.tb-btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+body.timing{padding-bottom:300px}
+body.timing .toast{bottom:calc(250px + env(safe-area-inset-bottom,0px))}
 .qsub{display:none}
 .today-top{flex-wrap:nowrap}
 .today-facts{grid-template-columns:repeat(3,minmax(0,1fr))}
@@ -613,6 +631,16 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
   </form>
 </dialog>
 
+<div id="timerBar" class="timerbar" role="timer" aria-live="polite" hidden>
+  <div class="tb-prog"><i id="tbProg"></i></div>
+  <div class="tb-top"><div class="tb-txt"><small id="tbName"></small><span id="tbLabel"></span></div><b id="tbTime" class="tb-time">0:00</b></div>
+  <div class="tb-btns">
+    <button type="button" id="tbNext" class="btn primary small" hidden></button>
+    <button type="button" id="tbPlus" class="btn ghost small">+1 min</button>
+    <button type="button" id="tbPause" class="btn ghost small">Jeda</button>
+    <button type="button" id="tbStop" class="btn ghost small">Batal</button>
+  </div>
+</div>
 <input id="importFile" class="vh" type="file" accept="application/json,.json">
 <div id="toast" class="toast" role="status" hidden></div>
 
@@ -940,47 +968,185 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
   }
 
   /* ---------- air fryer recipes ---------- */
+  // Steps: plain text, or {s: text, t: minutes for a timer, done: what to do when it rings}.
+  var PREHEAT = {s:"Panaskan air fryer KOSONG 200°C selama 5 minit. Bakul panas = luar terus perang.", t:5, done:"Air fryer dah panas. Masukkan ayam."};
   var RECIPES = [
-    {name:"Ayam Tandoori", meta:"190°C · 16–18 min · +₹10",
-      marinade:["2 sudu besar dadih (curd)","1 sudu teh serbuk cili Kashmiri","¼ sudu teh kunyit","½ sudu teh garam masala","1 sudu teh pes halia & bawang putih","Perahan ½ biji lemon, garam secukup rasa"],
-      steps:["Gaul semua bahan perap dengan 160 g dada ayam. Perap sekurang-kurangnya 30 minit (paling sedap semalaman).","Panaskan air fryer 190°C selama 3 minit.","Masak 16–18 minit, terbalikkan pada minit ke-8.","Hidang dengan bawang merah hiris dan lemon."],
+    {name:"Ayam Kunyit (gaya ayam goreng kampung)", meta:"200°C · 14 min · +₹3", isNew:"Dibaiki: luar perang",
+      marinade:["1 sudu teh kunyit","1 sudu teh serbuk cili","1 sudu teh pes halia & bawang putih","½ sudu teh garam","1 sudu teh tepung jagung atau tepung beras (rahsia luar garing)","1 sudu teh minyak (½ untuk perap, ½ untuk sapu)"],
+      steps:[
+        "Belah ayam jadi 2 keping nipis, tebal ~1.5 cm (sama tebal semua). Lap SANGAT kering dengan tisu.",
+        {s:"Gaul kunyit, cili, halia-bawang putih, garam dan ½ sudu teh minyak. Perap.", t:15, done:"Perapan siap. Panaskan air fryer."},
+        "Tabur tepung jagung atas ayam, gaul sampai tiada serbuk putih. Ini yang buat luar garing dan perang.",
+        PREHEAT,
+        {s:"Susun ayam SATU lapis, jarak antara keping, jangan bertindih. Sapu separuh baki minyak di atas. Masak 200°C.", t:9, done:"Terbalikkan ayam dan sapu baki minyak."},
+        {s:"Terbalikkan, sapu baki minyak. Masak lagi 200°C.", t:5, done:"Semak: luar perang keemasan? Kalau masih pucat, tambah 2 minit."},
+        {s:"Masih pucat? Tambah masa pada 200°C.", t:2, done:"Angkat ayam dan rehatkan."},
+        {s:"Rehatkan ayam atas pinggan sebelum potong supaya jus tak keluar.", t:3, done:"Siap! Selamat makan."}
+      ],
+      note:"Kenapa luar pucat dulu: ayam basah, suhu 190°C terlalu rendah, dan tiada minyak di permukaan. Tepung jagung + 200°C + lap kering betulkan semua."},
+    {name:"Ayam Tandoori", meta:"200°C · 15 min · +₹10",
+      marinade:["2 sudu besar dadih (curd) pekat, toskan airnya","1 sudu teh serbuk cili Kashmiri","¼ sudu teh kunyit","½ sudu teh garam masala","1 sudu teh pes halia & bawang putih","Perahan ½ biji lemon, garam secukup rasa","1 sudu teh minyak"],
+      steps:[
+        {s:"Gaul semua bahan perap dengan 160 g dada ayam. Perap sekurang-kurangnya 30 minit (paling sedap semalaman dalam peti sejuk).", t:30, done:"Perapan siap. Panaskan air fryer."},
+        PREHEAT,
+        {s:"Kikis lebihan dadih (lapisan nipis saja, tebal = pucat). Susun satu lapis. Masak 200°C.", t:8, done:"Terbalikkan ayam dan sapu sedikit minyak."},
+        {s:"Terbalikkan, sapu minyak. Masak lagi 200°C sampai tepi ada kesan hangit sikit.", t:7, done:"Semak warna. Rehatkan ayam."},
+        {s:"Rehatkan, kemudian hidang dengan bawang merah hiris dan lemon.", t:3, done:"Siap! Selamat makan."}
+      ],
       note:"Dadih buat ayam lembut dan tambah ~2 g protein. Ini pilihan paling 'macam kedai'."},
-    {name:"Ayam Kunyit (gaya ayam goreng kampung)", meta:"190°C · 16–18 min · +₹3",
-      marinade:["1 sudu teh kunyit","1 sudu teh serbuk cili","1 sudu teh pes halia & bawang putih","½ sudu teh garam","1 sudu teh minyak"],
-      steps:["Hiris ayam 2 keping nipis supaya cepat masak.","Perap 15 minit.","Air fry 190°C 16–18 minit, terbalikkan separuh masa sampai tepi garing."],
-      note:"Paling murah dan rasa macam rumah. Sedap dengan nasi panas dan sedikit kicap."},
-    {name:"Ayam Lada Hitam", meta:"180°C · 18 min · +₹5",
+    {name:"Ayam Lada Hitam", meta:"190°C · 16 min · +₹5",
       marinade:["1 sudu besar kicap","1 sudu teh lada hitam kasar","2 ulas bawang putih cincang","½ sudu teh gula atau madu","1 sudu teh minyak"],
-      steps:["Perap 20 minit. Simpan sedikit perapan.","Air fry 180°C 18 minit, terbalikkan pada minit ke-9.","Sapu baki perapan 2 minit terakhir supaya berkilat."],
+      steps:[
+        {s:"Perap. Simpan 1 sudu teh perapan untuk disapu nanti.", t:20, done:"Perapan siap. Panaskan air fryer."},
+        {s:"Panaskan air fryer kosong 190°C. (Kicap & gula cepat perang, jadi tak perlu 200°C.)", t:4, done:"Masukkan ayam."},
+        {s:"Lap lebihan perapan, susun satu lapis. Masak 190°C.", t:8, done:"Terbalikkan ayam."},
+        {s:"Terbalikkan. Masak lagi 190°C.", t:6, done:"Sapu baki perapan sekarang."},
+        {s:"Sapu baki perapan supaya berkilat. Masak 2 minit lagi.", t:2, done:"Rehatkan ayam."},
+        {s:"Rehatkan sebelum potong.", t:3, done:"Siap! Selamat makan."}
+      ],
       note:"Rasa 'restoran' tanpa kuah. Tambah bawang besar dalam bakul untuk 5 minit terakhir."},
-    {name:"Ayam Peri-Peri", meta:"190°C · 16 min · +₹6",
+    {name:"Ayam Peri-Peri", meta:"200°C · 14 min · +₹6",
       marinade:["1 sudu teh cili flakes","1 sudu teh serbuk cili Kashmiri atau paprika","½ sudu teh serbuk bawang putih","½ sudu teh oregano","Jus ½ lemon, garam","1 sudu teh minyak"],
-      steps:["Perap 20 minit.","Air fry 190°C 16 minit, terbalikkan separuh masa.","Perah lemon lagi selepas masak."],
+      steps:[
+        {s:"Lap ayam kering, kemudian perap.", t:20, done:"Perapan siap. Panaskan air fryer."},
+        PREHEAT,
+        {s:"Susun satu lapis. Masak 200°C.", t:8, done:"Terbalikkan ayam."},
+        {s:"Terbalikkan. Masak lagi 200°C.", t:6, done:"Semak warna. Rehatkan ayam."},
+        {s:"Rehatkan, kemudian perah lemon lagi.", t:3, done:"Siap! Selamat makan."}
+      ],
       note:"Pedas masam. Bagus kalau dah bosan rasa kari."},
-    {name:"Ayam Chettinad Kering", meta:"190°C · 17 min · +₹5",
+    {name:"Ayam Chettinad Kering", meta:"200°C · 15 min · +₹5",
       marinade:["1 sudu teh lada hitam","½ sudu teh jintan putih","½ sudu teh serbuk ketumbar","1 sudu teh serbuk cili, ¼ sudu teh kunyit","1 sudu teh pes halia & bawang putih","Garam, 1 sudu teh minyak, daun kari (jika ada)"],
-      steps:["Sangai rempah kering 1 minit di kuali (pilihan, lebih wangi).","Perap 20 minit.","Air fry 190°C 17 minit, terbalikkan separuh masa."],
+      steps:[
+        "Sangai rempah kering 1 minit di kuali (pilihan, lebih wangi).",
+        {s:"Lap ayam kering, kemudian perap.", t:20, done:"Perapan siap. Panaskan air fryer."},
+        PREHEAT,
+        {s:"Susun satu lapis. Masak 200°C.", t:9, done:"Terbalikkan ayam."},
+        {s:"Terbalikkan. Masak lagi 200°C.", t:6, done:"Semak warna. Rehatkan ayam."},
+        {s:"Rehatkan sebelum potong.", t:3, done:"Siap! Selamat makan."}
+      ],
       note:"Berempah dan pedas, sesuai ganti kuah Kerala."}
   ];
   var TIPS = [
-    "Ketuk atau belah dada ayam supaya tebal sama (~2 cm). Masak sekata dan tak kering.",
+    "Luar pucat tapi dalam masak? Lap ayam sangat kering, panaskan air fryer dulu, guna 200°C, dan sapu sedikit minyak di permukaan. Jangan susun bertindih.",
+    "Belah dada ayam supaya tebal sama (~1.5 cm). Masak sekata dan tak kering.",
     "Rendam dalam air garam 15 minit (1 sudu besar garam + 500 ml air), lap kering, baru perap. Ayam jadi juicy.",
     "Guna 1 sudu teh minyak saja. Minyak ini dah dikira dalam pelan diet.",
-    "Ayam masak bila bahagian tengah 74°C, atau jus jernih dan tiada warna merah jambu. Rehat 5 minit sebelum potong.",
-    "Perap untuk 2 hari sekali gus. Ayam mentah berperap simpan dalam peti sejuk paling lama 2 hari; ayam masak 3–4 hari.",
-    "Tukar resepi setiap hari supaya tak bosan. Ini cara paling murah elak Kerala Food."
+    "Ayam masak bila bahagian tengah 74°C, atau jus jernih dan tiada warna merah jambu.",
+    "Perap untuk 2 hari sekali gus. Ayam mentah berperap simpan dalam peti sejuk paling lama 2 hari; ayam masak 3–4 hari."
   ];
   function renderRecipes(){
     var el = $("recipes"); if (!el) return;
-    el.innerHTML = '<div class="panel-head"><h2>Resepi air fryer: dada ayam</h2><span class="meta">160 g sehidang · ~192 kcal · 36 g protein</span></div>' +
+    el.innerHTML = '<div class="panel-head"><h2>Resepi air fryer: dada ayam</h2><span class="meta">160 g sehidang · ~200 kcal · 36 g protein</span></div>' +
       '<ul class="tips">' + TIPS.map(function(t){ return '<li>' + esc(t) + '</li>'; }).join("") + '</ul>' +
-      '<div class="recipes">' + RECIPES.map(function(r){
-        return '<details class="recipe"><summary><span class="rname">' + esc(r.name) + '</span><span class="rmeta">' + esc(r.meta) + '</span></summary>' +
+      '<div class="recipes">' + RECIPES.map(function(r, ri){
+        return '<details class="recipe"' + (ri === 0 ? " open" : "") + '><summary><span class="rname">' + esc(r.name) + (r.isNew ? ' <span class="rnew">' + esc(r.isNew) + '</span>' : "") + '</span><span class="rmeta">' + esc(r.meta) + '</span></summary>' +
           '<div class="rbody"><h4>Perapan untuk 160 g ayam</h4><ul>' + r.marinade.map(function(m){ return '<li>' + esc(m) + '</li>'; }).join("") + '</ul>' +
-          '<h4>Cara</h4><ol>' + r.steps.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join("") + '</ol>' +
+          '<h4>Cara · tekan ⏱ untuk mula pemasa</h4><ol class="rsteps">' + r.steps.map(function(s, si){
+            if (typeof s === "string") return '<li>' + esc(s) + '</li>';
+            return '<li><span>' + esc(s.s) + '</span> <button type="button" class="tbtn" data-tmr="' + ri + '.' + si + '">⏱ ' + s.t + ' min</button></li>';
+          }).join("") + '</ol>' +
           '<p class="hint">' + esc(r.note) + '</p></div></details>';
       }).join("") + '</div>' +
-      '<p class="hint">Masa air fryer berbeza ikut model. Semak ayam pada minit ke-14 kali pertama.</p>';
+      '<p class="hint">Masa air fryer berbeza ikut model. Kali pertama, intai ayam 2 minit sebelum pemasa habis. Biarkan skrin telefon menyala supaya bunyi pemasa kedengaran.</p>';
+  }
+
+  /* ---------- cooking timer ---------- */
+  var T = {ri:-1, si:-1, endAt:0, left:0, total:0, paused:false, rang:false}, tTick = null, tAudio = null, tLock = null;
+  var T_KEY = "jurnalRupee.timer";
+  function tStep(ri, si){ var s = RECIPES[ri] && RECIPES[ri].steps[si]; return s && typeof s === "object" ? s : null; }
+  function tNext(ri, si){ var st = RECIPES[ri].steps; for (var i = si + 1; i < st.length; i++) if (typeof st[i] === "object") return i; return -1; }
+  function tSave(){ try { if (T.ri < 0) localStorage.removeItem(T_KEY); else localStorage.setItem(T_KEY, JSON.stringify(T)); } catch (e) {} }
+  function tFmt(ms){ var s = Math.max(0, Math.ceil(ms / 1000)); return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+  function tLeft(){ return T.paused ? T.left : T.endAt - Date.now(); }
+  function tUnlockAudio(){
+    try { if (!tAudio) tAudio = new (window.AudioContext || window.webkitAudioContext)(); if (tAudio.state === "suspended") tAudio.resume(); } catch (e) {}
+  }
+  function tBeep(){
+    if (!tAudio) return;
+    try {
+      var t0 = tAudio.currentTime;
+      for (var i = 0; i < 6; i++) {
+        var o = tAudio.createOscillator(), g = tAudio.createGain(), at = t0 + i * 0.32 + (i >= 3 ? 0.5 : 0);
+        o.frequency.value = 880; o.type = "sine";
+        g.gain.setValueAtTime(0.0001, at); g.gain.exponentialRampToValueAtTime(0.5, at + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, at + 0.22);
+        o.connect(g); g.connect(tAudio.destination); o.start(at); o.stop(at + 0.25);
+      }
+    } catch (e) {}
+  }
+  function tWake(on){
+    try {
+      if (on && !tLock && navigator.wakeLock) navigator.wakeLock.request("screen").then(function(l){ tLock = l; l.addEventListener("release", function(){ tLock = null; }); }).catch(function(){});
+      if (!on && tLock) { tLock.release(); tLock = null; }
+    } catch (e) {}
+  }
+  function tRender(){
+    var bar = $("timerBar"); if (!bar) return;
+    var st = T.ri >= 0 ? tStep(T.ri, T.si) : null;
+    document.body.classList.toggle("timing", !!st);
+    Array.prototype.forEach.call(document.querySelectorAll(".tbtn.on"), function(b){ b.classList.remove("on"); });
+    if (!st) { bar.hidden = true; return; }
+    var on = document.querySelector('.tbtn[data-tmr="' + T.ri + "." + T.si + '"]'); if (on) on.classList.add("on");
+    bar.hidden = false;
+    var left = tLeft(), done = T.rang;
+    bar.classList.toggle("done", done);
+    $("tbName").textContent = RECIPES[T.ri].name.replace(/ \(.*\)$/, "") + " · langkah " + (T.si + 1);
+    $("tbLabel").textContent = done ? st.done : st.s;
+    $("tbTime").textContent = done ? "Masa!" : tFmt(left);
+    $("tbProg").style.width = (done ? 100 : Math.min(100, 100 - left / T.total * 100)).toFixed(1) + "%";
+    $("tbPause").hidden = done; $("tbPause").textContent = T.paused ? "Sambung" : "Jeda";
+    var nx = tNext(T.ri, T.si);
+    $("tbNext").hidden = !(done && nx >= 0);
+    if (nx >= 0) $("tbNext").textContent = "Langkah seterusnya · " + RECIPES[T.ri].steps[nx].t + " min";
+    $("tbStop").textContent = done ? "Selesai" : "Batal";
+  }
+  function tLoop(){
+    clearInterval(tTick);
+    tTick = setInterval(function(){
+      if (T.ri < 0) { clearInterval(tTick); return; }
+      if (!T.paused && !T.rang && tLeft() <= 0) {
+        T.rang = true; tSave(); tBeep(); setTimeout(tBeep, 2200);
+        try { if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 400]); } catch (e) {}
+      }
+      tRender();
+    }, 250);
+  }
+  function tStart(ri, si){
+    var st = tStep(ri, si); if (!st) return;
+    tUnlockAudio();
+    T = {ri: ri, si: si, total: st.t * 60000, endAt: Date.now() + st.t * 60000, left: 0, paused: false, rang: false};
+    tSave(); tWake(true); tRender(); tLoop();
+  }
+  function tStop(){ T = {ri:-1, si:-1, endAt:0, left:0, total:0, paused:false, rang:false}; clearInterval(tTick); tSave(); tWake(false); tRender(); }
+  function setupTimer(){
+    var el = $("recipes"); if (!el) return;
+    el.addEventListener("click", function(ev){
+      var b = ev.target.closest("[data-tmr]"); if (!b) return;
+      var p = b.dataset.tmr.split(".").map(Number);
+      if (T.ri === p[0] && T.si === p[1] && !T.rang) return;
+      tStart(p[0], p[1]);
+    });
+    $("tbPause").addEventListener("click", function(){
+      tUnlockAudio();
+      if (T.paused) { T.endAt = Date.now() + T.left; T.paused = false; tWake(true); }
+      else { T.left = T.endAt - Date.now(); T.paused = true; tWake(false); }
+      tSave(); tRender();
+    });
+    $("tbPlus").addEventListener("click", function(){
+      tUnlockAudio();
+      if (T.rang) { T.rang = false; T.endAt = Date.now() + 60000; T.total = 60000; T.paused = false; tWake(true); }
+      else if (T.paused) { T.left += 60000; T.total += 60000; }
+      else { T.endAt += 60000; T.total += 60000; }
+      tSave(); tRender();
+    });
+    $("tbNext").addEventListener("click", function(){ var nx = tNext(T.ri, T.si); if (nx >= 0) tStart(T.ri, nx); });
+    $("tbStop").addEventListener("click", tStop);
+    document.addEventListener("visibilitychange", function(){ if (!document.hidden && T.ri >= 0 && !T.paused && !T.rang) tWake(true); });
+    try {
+      var saved = JSON.parse(localStorage.getItem(T_KEY) || "null");
+      if (saved && tStep(saved.ri, saved.si) && (saved.paused || saved.rang || saved.endAt > Date.now() - 600000)) { T = saved; tLoop(); }
+    } catch (e) {}
+    tRender();
   }
 
   /* ---------- render ---------- */
@@ -1430,6 +1596,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
     });
 
     renderRecipes();
+    setupTimer();
     showTab(location.hash.slice(1) || "hari");
     window.addEventListener("hashchange", function(){ showTab(location.hash.slice(1)); });
 
