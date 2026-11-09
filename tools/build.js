@@ -54,8 +54,8 @@ mainScript = mustReplace(mainScript,
 
 // Music tab (PWA only)
 mainScript = mustReplace(mainScript,
-  'var TABS = ["hari", "belanja", "bajet", "diet"];',
-  'var TABS = ["hari", "belanja", "bajet", "diet", "jurnal", "muzik"];',
+  'var TABS = ["hari", "belanja", "bajet", "diet", "resepi"];',
+  'var TABS = ["hari", "belanja", "bajet", "diet", "resepi", "jurnal", "muzik"];',
   "tabs list");
 bodyPart = mustReplace(bodyPart,
   '  <div class="view two" data-view="bajet" hidden>',
@@ -129,8 +129,8 @@ bodyPart = mustReplace(bodyPart,
   <div class="view two" data-view="bajet" hidden>`,
   "music view");
 bodyPart = mustReplace(bodyPart,
-  '<path d="M8 7.5c0-1.5 1-2 1-3.5M12 7.5c0-1.5 1-2 1-3.5M16 7.5c0-1.5 1-2 1-3.5"/></svg>Diet</button>',
-  `<path d="M8 7.5c0-1.5 1-2 1-3.5M12 7.5c0-1.5 1-2 1-3.5M16 7.5c0-1.5 1-2 1-3.5"/></svg>Diet</button>
+  '<path d="M6 16.5h12"/></svg>Resepi</button>',
+  `<path d="M6 16.5h12"/></svg>Resepi</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="jurnal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 8h6M9 11.5h4"/></svg>Jurnal</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="muzik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>Muzik</button>`,
   "music tab button");
@@ -169,8 +169,9 @@ img{max-width:100%}
 [hidden]{display:none!important}
 .vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
 .filebtn{display:inline-flex;align-items:center;color:var(--ink);font-size:.8rem}
-.tabbar-in{grid-template-columns:repeat(6,minmax(0,1fr))}
-.tabbtn{font-size:.64rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabbar-in{grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:5px}
+.tabbtn{font-size:.6rem;min-width:0;padding:8px 1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabbtn svg{width:21px;height:21px}
 body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
 .jform{display:flex;flex-direction:column;gap:12px}
 .jrow{display:flex;align-items:center;gap:10px}

@@ -284,7 +284,7 @@ dialog::backdrop{background:rgba(14,12,24,.55)}
 .roundbtn svg{width:20px;height:20px}
 .roundbtn:disabled{opacity:.5;cursor:not-allowed}
 .cyclebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-body[data-tab="hari"] .cyclebar,body[data-tab="diet"] .cyclebar{display:none}
+body[data-tab="hari"] .cyclebar,body[data-tab="diet"] .cyclebar,body[data-tab="resepi"] .cyclebar{display:none}
 .view{display:flex;flex-direction:column;gap:16px;min-width:0}
 @media (min-width:860px){.view.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:start}.view.two > .span2{grid-column:1/-1}}
 .panel,.summary{border-radius:20px;box-shadow:var(--shadow)}
@@ -299,7 +299,7 @@ body[data-tab="hari"] .cyclebar,body[data-tab="diet"] .cyclebar{display:none}
 .hero-btn{background:var(--hero-ink);color:var(--surface);border-radius:999px;padding:10px 16px}
 .today-goals{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
 .tabbar{position:fixed;left:0;right:0;bottom:0;z-index:15;pointer-events:none;padding:8px max(12px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(12px,env(safe-area-inset-left,0px))}
-.tabbar-in{pointer-events:auto;max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;background:var(--nav-bg);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:26px;padding:6px;box-shadow:var(--shadow)}
+.tabbar-in{pointer-events:auto;max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;background:var(--nav-bg);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:26px;padding:6px;box-shadow:var(--shadow)}
 .tabbtn{display:flex;flex-direction:column;align-items:center;gap:4px;padding:9px 4px;border:0;background:transparent;border-radius:20px;color:var(--muted);font:600 .72rem/1 var(--f-body);cursor:pointer}
 .tabbtn svg{width:23px;height:23px}
 .tabbtn[aria-current="page"]{background:var(--accent-soft);color:var(--accent)}
@@ -317,6 +317,7 @@ body[data-tab="hari"] .cyclebar,body[data-tab="diet"] .cyclebar{display:none}
 .tips{font-size:.88rem}
 .rnew{display:inline-block;margin-left:4px;padding:2px 8px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:.68rem;font-weight:600;vertical-align:2px}
 .rsteps li{line-height:1.5}
+.spair{margin:0;font-size:.85rem}
 .tbtn{display:inline-flex;align-items:center;gap:4px;margin:3px 0 2px;padding:5px 11px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);font:600 .78rem/1 var(--f-body);cursor:pointer;white-space:nowrap}
 .tbtn.on{background:var(--accent);color:var(--accent-ink)}
 .timerbar{position:fixed;left:12px;right:12px;bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:16;max-width:536px;margin:0 auto;background:var(--surface);border:1px solid var(--accent);border-radius:18px;padding:10px 12px 12px;box-shadow:var(--shadow);overflow:hidden}
@@ -355,8 +356,9 @@ img{max-width:100%}
 [hidden]{display:none!important}
 .vh{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden;pointer-events:none}
 .filebtn{display:inline-flex;align-items:center;color:var(--ink);font-size:.8rem}
-.tabbar-in{grid-template-columns:repeat(6,minmax(0,1fr))}
-.tabbtn{font-size:.64rem;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabbar-in{grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:5px}
+.tabbtn{font-size:.6rem;min-width:0;padding:8px 1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabbtn svg{width:21px;height:21px}
 body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
 .jform{display:flex;flex-direction:column;gap:12px}
 .jrow{display:flex;align-items:center;gap:10px}
@@ -434,7 +436,11 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
 
   <div class="view" data-view="diet" hidden>
     <section id="diet" class="panel" hidden></section>
+  </div>
+
+  <div class="view" data-view="resepi" hidden>
     <section id="recipes" class="panel"></section>
+    <section id="sauces" class="panel"></section>
   </div>
 
   <div class="view two" data-view="belanja" hidden>
@@ -567,6 +573,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
     <button type="button" class="tabbtn" data-action="tab" data-tab="belanja"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Belanja</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="bajet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 3.1A9 9 0 1 0 20.9 13H11z"/><path d="M14 3.2a9 9 0 0 1 6.8 6.8H14z"/></svg>Bajet</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="diet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 7.5c0-1.5 1-2 1-3.5M12 7.5c0-1.5 1-2 1-3.5M16 7.5c0-1.5 1-2 1-3.5"/></svg>Diet</button>
+    <button type="button" class="tabbtn" data-action="tab" data-tab="resepi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 13.9A4 4 0 0 1 7 6.1a5 5 0 0 1 10 0 4 4 0 0 1 1 7.8V20H6z"/><path d="M6 16.5h12"/></svg>Resepi</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="jurnal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 8h6M9 11.5h4"/></svg>Jurnal</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="muzik"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>Muzik</button>
   </div>
@@ -955,7 +962,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
   }
 
   /* ---------- tabs ---------- */
-  var TABS = ["hari", "belanja", "bajet", "diet", "jurnal", "muzik"];
+  var TABS = ["hari", "belanja", "bajet", "diet", "resepi", "jurnal", "muzik"];
   function showTab(t){
     if (TABS.indexOf(t) < 0) t = "hari";
     document.body.dataset.tab = t;
@@ -1049,6 +1056,43 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
           '<p class="hint">' + esc(r.note) + '</p></div></details>';
       }).join("") + '</div>' +
       '<p class="hint">Masa air fryer berbeza ikut model. Kali pertama, intai ayam 2 minit sebelum pemasa habis. Biarkan skrin telefon menyala supaya bunyi pemasa kedengaran.</p>';
+    renderSauces();
+  }
+
+  /* ---------- small sauces ---------- */
+  var SAUCES = [
+    {name:"Sos Cili Kicap", tag:"Paling senang", kcal:15, cost:"₹2", time:"1 min", pair:"Ayam Kunyit, Ayam Lada Hitam",
+      ing:["1 sudu besar kicap (soy sauce)","1–2 cili hijau atau cili padi, hiris halus","1 ulas bawang putih, cincang","Perahan ½ biji limau nipis atau lemon","½ sudu teh gula (pilihan)"],
+      steps:["Gaul semua dalam mangkuk kecil.","Biar 5 minit supaya pedas cili dan bawang putih keluar."],
+      keep:"Buat baru setiap kali. Rasa macam sos cili kicap kedai mamak."},
+    {name:"Hari Chutney (chutney hijau)", tag:"Paling murah sebulan", serves:5, kcal:10, cost:"₹3", time:"5 min", pair:"Ayam Tandoori, Ayam Chettinad",
+      ing:["1 ikat kecil daun ketumbar (₹10), batang sekali","10–15 helai daun pudina","1–2 cili hijau","1 cm halia","Perahan ½ biji lemon, garam","2–3 sudu besar air sejuk"],
+      steps:["Basuh daun, masukkan semua dalam pengisar.","Kisar sampai licin. Tambah air sedikit demi sedikit kalau terlalu pekat.","Rasa: tambah lemon kalau kurang masam, garam kalau kurang masin."],
+      keep:"Satu batch cukup 5 hidangan. Peti sejuk 3 hari dalam bekas bertutup, atau beku dalam bekas ais (ice tray) sampai 1 bulan: keluarkan 1 kiub setiap kali makan."},
+    {name:"Sos Yogurt Bawang Putih (gaya shawarma)", tag:"Ada protein", kcal:45, cost:"₹6", time:"5 min + 1 jam tos", pair:"Ayam Peri-Peri, Ayam Tandoori",
+      ing:["4 sudu besar dadih (curd), ditos jadi pekat","1 ulas bawang putih, parut halus","Perahan ¼ biji lemon","Secubit garam, lada hitam dan serbuk jintan","Daun pudina hiris (pilihan)"],
+      steps:["Tos dadih: letak atas kain bersih atau tisu dalam penapis, simpan dalam peti sejuk 1 jam. Air keluar, dadih jadi pekat macam yogurt Greek.","Gaul dadih pekat dengan bawang putih, lemon, garam, lada hitam dan jintan.","Biar 10 minit supaya rasa bawang putih sebati."],
+      keep:"Peti sejuk 3 hari. Tos 2–3 hidangan sekali gus untuk jimat masa."},
+    {name:"Sambal Tomato Segar (gaya air asam)", tag:"Segar & masam", kcal:25, cost:"₹5", time:"5 min", pair:"Ayam Kunyit, nasi panas",
+      ing:["1 biji tomato kecil, potong dadu","¼ biji bawang besar, cincang halus","1 cili hijau atau merah, hiris","Perahan ½ biji limau nipis","1 sudu teh kicap, secubit garam dan gula","1 sudu teh air asam jawa (pilihan, lebih rasa air asam)"],
+      steps:["Gaul tomato, bawang dan cili.","Masukkan limau, kicap, garam, gula dan air asam. Gaul dan rasa.","Biar 5 minit supaya tomato keluar air."],
+      keep:"Buat baru setiap kali. Peti sejuk 1 hari saja."},
+    {name:"Sos Kacang Ringan (gaya satay)", tag:"Sekali-sekala", kcal:100, cost:"₹8", time:"3 min", pair:"Ayam Kunyit, Ayam Lada Hitam",
+      ing:["1 sudu besar peanut butter","1 sudu teh kicap","½ sudu teh serbuk cili atau cili flakes","Perahan ¼ biji lemon","2–3 sudu besar air panas"],
+      steps:["Gaul peanut butter dengan air panas sampai cair.","Masukkan kicap, cili dan lemon. Gaul sampai licin."],
+      keep:"Kalori paling tinggi. Bila guna ini, kurangkan sedikit nasi pada hidangan yang sama."}
+  ];
+  function renderSauces(){
+    var el = $("sauces"); if (!el) return;
+    el.innerHTML = '<div class="panel-head"><h2>Sos kecil untuk ayam</h2><span class="meta">Sehidang = 2 sudu besar</span></div>' +
+      '<p class="hint">Sos buat ayam yang sama rasa lain setiap hari. Empat yang pertama di bawah 50 kcal, jadi pelan diet tak berubah.</p>' +
+      '<div class="recipes">' + SAUCES.map(function(r){
+        return '<details class="recipe"><summary><span class="rname">' + esc(r.name) + ' <span class="rnew">' + esc(r.tag) + '</span></span><span class="rmeta">~' + r.kcal + ' kcal · ' + esc(r.cost) + ' · ' + esc(r.time) + '</span></summary>' +
+          '<div class="rbody"><h4>Bahan (' + (r.serves || 1) + ' hidangan)</h4><ul>' + r.ing.map(function(m){ return '<li>' + esc(m) + '</li>'; }).join("") + '</ul>' +
+          '<h4>Cara</h4><ol>' + r.steps.map(function(s){ return '<li>' + esc(s) + '</li>'; }).join("") + '</ol>' +
+          '<p class="spair"><b>Padan dengan:</b> ' + esc(r.pair) + '</p>' +
+          '<p class="hint">' + esc(r.keep) + '</p></div></details>';
+      }).join("") + '</div>';
   }
 
   /* ---------- cooking timer ---------- */
