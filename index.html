@@ -466,6 +466,22 @@ body.timing .toast{bottom:calc(250px + env(safe-area-inset-bottom,0px))}
 .glog p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;line-height:1.5}
 .glog p span{display:block;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
 .rate label{padding:7px 11px}
+.ab{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.ab li{display:flex;align-items:flex-start;gap:10px;padding:10px;border-radius:12px;background:var(--bg)}
+.ab li.ab-b{background:var(--accent-soft)}
+.abtag{width:26px;height:26px;flex:none;border-radius:8px;display:inline-grid;place-items:center;background:var(--accent);color:var(--accent-ink);font:700 .85rem/1 var(--f-display)}
+.abtag.b,.ab-b .abtag{background:var(--warn);color:#fff}
+.abtag.sm{width:20px;height:20px;font-size:.72rem;border-radius:6px;vertical-align:-5px;margin-right:4px}
+.ab-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.ab-t small{font-size:.68rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.ab-t b{font-weight:600;overflow-wrap:anywhere;line-height:1.4}
+.ab li.done .ab-t b{color:var(--ok)}
+.abchk{width:28px;height:28px;flex:none;border-radius:50%;border:2px solid var(--line);background:var(--surface);color:var(--ok);font:700 .9rem/1 var(--f-body);cursor:pointer;display:grid;place-items:center}
+.abchk.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.abok{color:var(--ok);font-weight:700}
+.gchip .has{font-style:normal;color:var(--ok);font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.gsec-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.gsec-h h2{margin:0}
 @media (max-width:420px){.gstats dd{font-size:1rem}.gchip{padding:7px 6px}}
 </style>
 <style>
@@ -813,8 +829,11 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
   <form id="goalForm" class="dlgform" novalidate>
     <div class="dlg-head"><h2 id="goalDlgTitle">Goal baru</h2><button type="button" class="iconbtn" data-close aria-label="Tutup">×</button></div>
     <p id="goCtx" class="hint" hidden></p>
-    <div class="field"><label for="goTitle">Goal</label><input id="goTitle" type="text" maxlength="120" autocomplete="off"></div>
-    <div class="field"><label for="goWhy" id="goWhyLbl">Kenapa goal ini penting?</label><textarea id="goWhy" rows="2" maxlength="600"></textarea></div>
+    <div class="field" id="goNameWrap"><label for="goName">Nama ringkas <span class="opt">(untuk sub-tab, cth. Kerjaya, Kesihatan)</span></label><input id="goName" type="text" maxlength="40" autocomplete="off"></div>
+    <div class="field"><label for="goTitle"><span class="abtag sm">A</span> Goal A · asas, yang mesti dicapai</label><textarea id="goTitle" rows="2" maxlength="160"></textarea></div>
+    <div class="field"><label for="goTitleB"><span class="abtag sm b">B</span> Goal B · lebih spesifik, versi ideal <span class="opt">(pilihan)</span></label><textarea id="goTitleB" rows="2" maxlength="160"></textarea></div>
+    <p class="hint" style="margin:-4px 0 0">Goal A tentukan apa yang mesti berlaku. Goal B tambah syarat yang buat ia lebih bermakna: di mana, dengan siapa, tahap berapa.</p>
+    <div class="field"><label for="goWhy" id="goWhyLbl">Nota / kenapa penting <span class="opt">(pilihan)</span></label><textarea id="goWhy" rows="2" maxlength="600"></textarea></div>
     <div class="field" id="goStartWrap"><label for="goStart">Mula pada</label><input id="goStart" type="date"></div>
     <div id="goDates"></div>
     <p id="goErr" class="form-error" hidden></p>
@@ -1926,58 +1945,73 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
     withRetry(function(){ return db.doc("agenda/" + id).set(body); }).then(function(){ if (done) toast("Siap! 👏"); }).catch(function(e){ toast(writeErrMsg(e)); });
   }
 
-  /* ---------- long-term goals: 3 years → 1 year → 90 days ---------- */
+  /* ---------- long-term goals: 3 years / 1 year / 90 days, each with Goal A and Goal B ---------- */
+  // One doc per time frame (Ferrazzi's goal-setting sheet):
+  //   3y  = the sub-tab; holds the start date every other date is worked out from
+  //   1y  = one per year (year 0..2) of that 3-year span
+  //   90d = one per 90-day round (year 0..2, q 0..3); daily "Belajar & Cuba" logs hang off it
+  // title = Goal A (baseline, must happen), titleB = Goal B (the richer, more specific version).
   var LEVELS = {"3y":"3 tahun", "1y":"1 tahun", "90d":"90 hari"};
-  var gDraft = null, gDelArm = false;
+  var gDraft = null, gDelArm = false, migrated = false, planLoaded = false, glogLoaded = false;
   function addYears(s, n){ var d = toDate(s), m = d.getMonth(); d.setFullYear(d.getFullYear() + n); if (d.getMonth() !== m) d.setDate(0); return ymd(d); }
-  function letter(i){ return i >= 0 && i < 26 ? String.fromCharCode(65 + i) : String(i + 1); }
   function byCreated(a, b){ return String(a.createdAt).localeCompare(String(b.createdAt)); }
   function planById(id){ for (var i = 0; i < S.plan.length; i++) if (S.plan[i].id === id) return S.plan[i]; return null; }
-  function kids(parent, filt){ return S.plan.filter(function(g){ return g.parent === parent && (!filt || filt(g)); }).sort(byCreated); }
-  function roots(){ return S.plan.filter(function(g){ return g.level === "3y" && isDate(g.start); }).sort(byCreated); }
-  function rootOf(g){ var n = 0; while (g && g.level !== "3y" && n++ < 4) g = planById(g.parent); return g && g.level === "3y" && isDate(g.start) ? g : null; }
+  function roots(){ return S.plan.filter(function(g){ return g.v === 2 && g.level === "3y" && isDate(g.start); }).sort(byCreated); }
+  function rootOf(g){ if (!g) return null; var r = g.level === "3y" ? g : planById(g.parent); return r && r.v === 2 && r.level === "3y" && isDate(r.start) ? r : null; }
+  function yearDoc(root, y){ return S.plan.filter(function(g){ return g.v === 2 && g.level === "1y" && g.parent === root.id && g.year === y; }).sort(byCreated)[0] || null; }
+  function roundDoc(root, y, q){ return S.plan.filter(function(g){ return g.v === 2 && g.level === "90d" && g.parent === root.id && g.year === y && g.q === q; }).sort(byCreated)[0] || null; }
   function yearRange(root, y){ return {a:addYears(root.start, y), b:addDays(addYears(root.start, y + 1), -1)}; }
   function qRange(root, y, q){ var yr = yearRange(root, y); return {a:addDays(yr.a, 90 * q), b:q < 3 ? addDays(yr.a, 90 * (q + 1) - 1) : yr.b}; }
   function rangeOf(g){
     var r = rootOf(g); if (!r) return null;
     if (g.level === "3y") return {a:r.start, b:addDays(addYears(r.start, 3), -1)};
     if (g.level === "1y") return yearRange(r, g.year);
-    var one = planById(g.parent); return one ? qRange(r, one.year, g.q) : null;
+    return qRange(r, g.year, g.q);
   }
   function curYear(root, day){ var y = 0; for (var i = 1; i < 3; i++) if (day >= yearRange(root, i).a) y = i; return y; }
   function curQ(root, y, day){ var q = 0; for (var i = 1; i < 4; i++) if (day >= qRange(root, y, i).a) q = i; return q; }
-  function inRange(r, day){ return r && day >= r.a && day <= r.b; }
+  function inRange(r, day){ return !!r && day >= r.a && day <= r.b; }
   function logsOf(id){ return S.glog.filter(function(l){ return l.goal === id; }); }
   function timeFrac(r){ var tot = daysBetween(r.a, r.b) + 1; return Math.min(Math.max((daysBetween(r.a, todayStr()) + 1) / tot, 0), 1); }
   function avg(arr){ return arr.length ? arr.reduce(function(t, x){ return t + x; }, 0) / arr.length : 0; }
-  // 90 days: every day you write adds (success ÷ 5) of a day. Writing all 90 days at 5/5 = 100%.
-  // 1 year = average of its four 90-day rounds; 3 years = average of its three years. Empty rounds count as 0.
-  function progress(g){
-    if (g.done) return 1;
-    if (g.level === "90d") {
-      var r = rangeOf(g); if (!r) return 0;
-      var pts = 0;
-      logsOf(g.id).forEach(function(l){ if (inRange(r, l.date)) pts += (Number(l.rating) || 3) / 5; });
-      return Math.min(pts / (daysBetween(r.a, r.b) + 1), 1);
-    }
-    var parts = [], i, c;
-    if (g.level === "1y") for (i = 0; i < 4; i++) { c = kids(g.id, function(x){ return x.q === i; }); parts.push(c.length ? avg(c.map(progress)) : 0); }
-    else for (i = 0; i < 3; i++) { c = kids(g.id, function(x){ return x.year === i; }); parts.push(c.length ? avg(c.map(progress)) : 0); }
-    return avg(parts);
+  // 90 days: each day you write adds (success ÷ 5) of a day; all 90 days at 5/5 = 100%. Ticking Goal A = 100%.
+  // 1 year = average of its four 90-day rounds; 3 years = average of its three years. Rounds with no goal count as 0.
+  function logScore(g){
+    var r = rangeOf(g); if (!r) return 0;
+    var pts = 0;
+    logsOf(g.id).forEach(function(l){ if (inRange(r, l.date)) pts += (Number(l.rating) || 3) / 5; });
+    return Math.min(pts / (daysBetween(r.a, r.b) + 1), 1);
   }
+  function roundProg(root, y, q){ var d = roundDoc(root, y, q); return !d ? 0 : d.doneA ? 1 : logScore(d); }
+  function yearProg(root, y){ var d = yearDoc(root, y); if (d && d.doneA) return 1; return avg([0, 1, 2, 3].map(function(q){ return roundProg(root, y, q); })); }
+  function rootProg(root){ return root.doneA ? 1 : avg([0, 1, 2].map(function(y){ return yearProg(root, y); })); }
   function activeNineties(day){
-    return S.plan.filter(function(g){ return g.level === "90d" && !g.done && inRange(rangeOf(g), day); }).sort(byCreated);
+    return S.plan.filter(function(g){ return g.v === 2 && g.level === "90d" && !g.doneA && inRange(rangeOf(g), day); }).sort(byCreated);
   }
   function pbar(p, pace, label){
     return '<div class="pbar"><div class="meter thin" role="img" aria-label="' + esc(label + ": " + Math.round(p * 100) + "% kemajuan, " + Math.round(pace * 100) + "% masa sudah berlalu") + '">' +
       '<div class="meter-fill' + (p >= 1 ? " full" : "") + '" style="width:' + (p * 100).toFixed(1) + '%"></div><div class="meter-pace" style="left:' + (pace * 100).toFixed(1) + '%"></div></div><b>' + Math.round(p * 100) + '%</b></div>';
   }
   function editBtn(g){ return S.readOnly ? "" : '<button type="button" class="link" data-action="g-edit" data-id="' + esc(g.id) + '">Ubah</button>'; }
+  function abHtml(g){
+    function row(slot, text, done){
+      return '<li class="ab-' + slot.toLowerCase() + (done ? " done" : "") + '"><span class="abtag">' + slot + '</span><div class="ab-t"><small>' +
+        (slot === "A" ? "Goal A · asas" : "Goal B · lebih spesifik") + (done ? " · tercapai" : "") + '</small><b>' + esc(text) + '</b></div>' +
+        (S.readOnly ? (done ? '<span class="abok">✓</span>' : "")
+          : '<button type="button" class="abchk' + (done ? " on" : "") + '" data-action="g-done" data-id="' + esc(g.id) + '" data-slot="' + slot + '" aria-pressed="' + done + '" title="Tanda Goal ' + slot + ' tercapai" aria-label="Tanda Goal ' + slot + ' tercapai">' + (done ? "✓" : "") + '</button>') + '</li>';
+    }
+    return '<ul class="ab">' + row("A", g.title || "—", g.doneA) + (g.titleB ? row("B", g.titleB, g.doneB) : "") + '</ul>';
+  }
+  function whyHtml(g){ return g.why ? '<p class="g-why">' + esc(g.why) + '</p>' : ""; }
   function streakOf(g){
     var days = {}; logsOf(g.id).forEach(function(l){ days[l.date] = true; });
     var d = todayStr(), n = 0; if (!days[d]) d = addDays(d, -1);
     while (days[d]) { n++; d = addDays(d, -1); }
     return n;
+  }
+  function whenTxt(r, t){
+    var D = daysBetween(r.a, r.b) + 1, el = daysBetween(r.a, t) + 1;
+    return t < r.a ? "mula " + untilTxt(r.a) : t > r.b ? "tempoh tamat" : "hari " + nf0.format(el) + " daripada " + nf0.format(D) + " · " + nf0.format(D - el) + " hari lagi";
   }
 
   function renderPlan(){
@@ -1987,91 +2021,89 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
     if (S.noDb) { el.innerHTML = ""; return; }
     var rs3 = roots();
     if (!rs3.length) {
-      el.innerHTML = '<section class="panel gintro"><span class="eyebrow">Goal</span><h2>3 tahun → 1 tahun → 90 hari</h2>' +
-        '<p>Mula dengan satu goal besar untuk 3 tahun. App kira sendiri bila 3 tahun tamat, bila setiap tahun tamat, dan bila setiap pusingan 90 hari tamat.</p>' +
-        '<p>Kemudian pecahkan kepada goal 1 tahun (Goal A, Goal B…) dan goal 90 hari. Dalam goal 90 hari, tulis setiap hari apa yang anda <b>belajar</b> dan apa yang anda <b>cuba</b>, dan nilai sejauh mana anda berjaya. Bar kemajuan naik ikut catatan anda.</p>' +
+      el.innerHTML = '<section class="panel gintro"><span class="eyebrow">Goal</span><h2>3 tahun · 1 tahun · 90 hari</h2>' +
+        '<p>Setiap tempoh ada <b>Goal A</b> (asas, yang mesti berlaku) dan <b>Goal B</b> (versi lebih spesifik dan ideal). Contoh: 3 tahun A "jadi doktor bertauliah", B "housemanship di hospital pilihan di Malaysia".</p>' +
+        '<p>Mula dengan goal 3 tahun. App kira sendiri bila 3 tahun tamat, bila setiap tahun tamat dan bila setiap pusingan 90 hari tamat. Kemudian tetapkan goal untuk setiap tahun, dan goal yang sangat spesifik untuk setiap 90 hari. Dalam 90 hari, tulis setiap hari apa yang anda belajar dan cuba; bar kemajuan naik ikut catatan anda.</p>' +
         (S.readOnly ? "" : '<div><button type="button" class="btn primary" data-action="g-new" data-level="3y">+ Goal 3 tahun pertama</button></div>') + '</section>';
       return;
     }
-    if (!planById(S.pv.root) || planById(S.pv.root).level !== "3y") { S.pv.root = rs3[0].id; S.pv.year = null; S.pv.q = null; }
+    var cur = planById(S.pv.root);
+    if (!cur || cur.level !== "3y" || rs3.indexOf(cur) < 0) { S.pv.root = rs3[0].id; S.pv.year = null; S.pv.q = null; }
     var root = planById(S.pv.root), ri = rs3.indexOf(root);
     var tabs = '<div class="subtabs" role="tablist" aria-label="Goal 3 tahun">' + rs3.map(function(r, i){
-      return '<button type="button" role="tab" class="subtab" aria-selected="' + (r.id === root.id) + '" data-action="g-root" data-id="' + esc(r.id) + '"><b>Goal ' + letter(i) + '</b><span>' + esc(r.title) + '</span></button>';
-    }).join("") + (S.readOnly ? "" : '<button type="button" class="subtab add" data-action="g-new" data-level="3y">+ Goal 3 tahun</button>') + '</div>';
+      return '<button type="button" role="tab" class="subtab" aria-selected="' + (r.id === root.id) + '" data-action="g-root" data-id="' + esc(r.id) + '"><b>Goal ' + (i + 1) + '</b><span>' + esc(r.name || r.title) + '</span></button>';
+    }).join("") + (S.readOnly ? "" : '<button type="button" class="subtab add" data-action="g-new" data-level="3y">+ Goal baru</button>') + '</div>';
 
     var open = S.pv.open ? planById(S.pv.open) : null;
-    if (open && open.level === "90d" && rootOf(open) === root && planById(open.parent)) {
+    if (open && open.v === 2 && open.level === "90d" && rootOf(open) === root) {
       el.innerHTML = tabs + detailHtml(open, root, ri);
-      var r = rangeOf(open);
-      lp.hidden = S.readOnly || t < r.a;
+      lp.hidden = S.readOnly || t < rangeOf(open).a;
       logsEl.innerHTML = logsHtml(open);
       return;
     }
     S.pv.open = null;
 
-    var rr = rangeOf(root), left = daysBetween(t, rr.b);
+    var rr = rangeOf(root);
     if (S.pv.year == null) S.pv.year = t < root.start ? 0 : curYear(root, t);
     var y = S.pv.year, yr = yearRange(root, y);
     if (S.pv.q == null) S.pv.q = inRange(yr, t) ? curQ(root, y, t) : 0;
-    var q = S.pv.q, qr = qRange(root, y, q);
+    var q = S.pv.q, qr = qRange(root, y, q), yd = yearDoc(root, y), rd = roundDoc(root, y, q);
 
     var head = '<section class="panel groot">' +
-      '<div class="g-top"><span class="eyebrow">Goal ' + letter(ri) + ' · 3 tahun' + (root.done ? " · tercapai ✓" : "") + '</span>' + editBtn(root) + '</div>' +
-      '<h2 class="g-title">' + esc(root.title) + '</h2>' + (root.why ? '<p class="g-why">' + esc(root.why) + '</p>' : "") +
-      '<p class="g-dates">' + longDate(rr.a) + ' → ' + longDate(rr.b) + ' · ' + (t < rr.a ? "mula " + untilTxt(rr.a) : left >= 0 ? nf0.format(left) + " hari lagi" : "tempoh tamat") + '</p>' +
-      pbar(progress(root), timeFrac(rr), "Goal 3 tahun") +
-      '<p class="hint" style="margin:0">Bar = kemajuan anda. Garis hitam = masa yang sudah berlalu. Cuba kekal di depan garis.</p>' +
-      '<div class="gyears" role="group" aria-label="Pilih tahun">' + [0, 1, 2].map(function(i){
-        var r = yearRange(root, i), now = inRange(r, t);
-        return '<button type="button" class="gchip' + (i === y ? " sel" : "") + '" data-action="g-year" data-y="' + i + '" aria-pressed="' + (i === y) + '"><b>Tahun ' + (i + 1) + (now ? "<em>sekarang</em>" : "") + '</b><small>' + longDate(r.a) + ' – ' + longDate(r.b) + '</small></button>';
-      }).join("") + '</div></section>';
+      '<div class="g-top"><span class="eyebrow">Goal ' + (ri + 1) + ' · 3 tahun</span>' + editBtn(root) + '</div>' +
+      (root.name ? '<h2 class="g-title">' + esc(root.name) + '</h2>' : "") +
+      '<p class="g-dates">' + longDate(rr.a) + ' → ' + longDate(rr.b) + ' · ' + whenTxt(rr, t) + '</p>' +
+      abHtml(root) + whyHtml(root) +
+      pbar(rootProg(root), timeFrac(rr), "Goal 3 tahun") +
+      '<p class="hint" style="margin:0">Bar = kemajuan anda (dari catatan harian 90 hari). Garis hitam = masa yang sudah berlalu. Cuba kekal di depan garis.</p></section>';
 
-    var ones = kids(root.id, function(g){ return g.level === "1y" && g.year === y; });
-    var qchips = '<div class="gqs" role="group" aria-label="Pilih pusingan 90 hari">' + [0, 1, 2, 3].map(function(i){
-      var r = qRange(root, y, i), now = inRange(r, t);
-      return '<button type="button" class="gchip' + (i === q ? " sel" : "") + '" data-action="g-q" data-q="' + i + '" aria-pressed="' + (i === q) + '"><b>90 hari ' + (i + 1) + (now ? "<em>sekarang</em>" : "") + '</b><small>' + shortDate(r.a) + ' – ' + shortDate(r.b) + '</small></button>';
+    var yearChips = '<div class="gyears" role="group" aria-label="Pilih tahun">' + [0, 1, 2].map(function(i){
+      var r = yearRange(root, i), now = inRange(r, t);
+      return '<button type="button" class="gchip' + (i === y ? " sel" : "") + '" data-action="g-year" data-y="' + i + '" aria-pressed="' + (i === y) + '"><b>Tahun ' + (i + 1) + (now ? "<em>sekarang</em>" : "") + '</b><small>' + longDate(r.a) + ' – ' + longDate(r.b) + '</small>' +
+        (yearDoc(root, i) ? '<i class="has">✓ ada goal</i>' : "") + '</button>';
     }).join("") + '</div>';
-    var yearSec = '<section class="panel gyear"><div class="panel-head"><h2>Goal 1 tahun · Tahun ' + (y + 1) + '</h2>' +
-      (S.readOnly ? "" : '<button type="button" class="btn primary small" data-action="g-new" data-level="1y" data-parent="' + esc(root.id) + '" data-y="' + y + '">+ Goal 1 tahun</button>') + '</div>' +
-      '<p class="g-dates">' + longDate(yr.a) + ' → ' + longDate(yr.b) + '</p>' +
-      (ones.length ? qchips + ones.map(function(g, i){ return oneCard(g, i, q, qr, t); }).join("")
-        : '<div class="empty">Belum ada goal untuk Tahun ' + (y + 1) + '. Apa yang mesti berlaku dalam setahun ini supaya "' + esc(root.title) + '" tercapai?</div>') + '</section>';
-    el.innerHTML = tabs + head + yearSec;
+    var yearSec = '<section class="panel"><div class="gsec-h"><h2>1 tahun</h2>' + (yd ? editBtn(yd) : "") + '</div>' + yearChips +
+      (yd ? '<p class="g-dates">Tahun ' + (y + 1) + ' · ' + longDate(yr.a) + ' → ' + longDate(yr.b) + ' · ' + whenTxt(yr, t) + '</p>' + abHtml(yd) + whyHtml(yd) + pbar(yearProg(root, y), timeFrac(yr), "Goal tahun " + (y + 1))
+        : '<div class="empty">Belum ada goal untuk Tahun ' + (y + 1) + ' (' + longDate(yr.a) + ' – ' + longDate(yr.b) + ').' +
+          (S.readOnly ? "" : '<div style="margin-top:10px"><button type="button" class="btn primary small" data-action="g-new" data-level="1y" data-parent="' + esc(root.id) + '" data-y="' + y + '">+ Tetapkan goal Tahun ' + (y + 1) + '</button></div>') + '</div>') +
+      '</section>';
+
+    var qChips = '<div class="gqs" role="group" aria-label="Pilih pusingan 90 hari">' + [0, 1, 2, 3].map(function(i){
+      var r = qRange(root, y, i), now = inRange(r, t);
+      return '<button type="button" class="gchip' + (i === q ? " sel" : "") + '" data-action="g-q" data-q="' + i + '" aria-pressed="' + (i === q) + '"><b>90 hari ' + (i + 1) + (now ? "<em>sekarang</em>" : "") + '</b><small>' + shortDate(r.a) + ' – ' + shortDate(r.b) + '</small>' +
+        (roundDoc(root, y, i) ? '<i class="has">✓ ada goal</i>' : "") + '</button>';
+    }).join("") + '</div>';
+    var roundSec = '<section class="panel"><div class="gsec-h"><h2>90 hari · Tahun ' + (y + 1) + '</h2>' + (rd ? editBtn(rd) : "") + '</div>' + qChips +
+      (rd ? roundCard(rd, root, t)
+        : '<div class="empty">Belum ada goal untuk 90 hari ke-' + (q + 1) + ' (' + longDate(qr.a) + ' – ' + longDate(qr.b) + '). Buat ia sangat spesifik: apa yang akan siap dalam 90 hari ini?' +
+          (S.readOnly ? "" : '<div style="margin-top:10px"><button type="button" class="btn primary small" data-action="g-new" data-level="90d" data-parent="' + esc(root.id) + '" data-y="' + y + '" data-q="' + q + '">+ Tetapkan goal 90 hari ke-' + (q + 1) + '</button></div>') + '</div>') +
+      '</section>';
+    el.innerHTML = tabs + head + yearSec + roundSec;
   }
-  function oneCard(g, i, q, qr, t){
-    var nine = kids(g.id, function(x){ return x.q === q; });
-    return '<div class="gone"><div class="g-row"><span class="gbadge">' + letter(i) + '</span><div class="g-main"><b>' + esc(g.title) + (g.done ? " ✓" : "") + '</b>' + (g.why ? '<small>' + esc(g.why) + '</small>' : "") + '</div>' + editBtn(g) + '</div>' +
-      pbar(progress(g), timeFrac(rangeOf(g)), "Goal 1 tahun " + letter(i)) +
-      '<div class="g90h"><span>90 hari ' + (q + 1) + ' · ' + shortDate(qr.a) + ' – ' + shortDate(qr.b) + '</span>' +
-        (S.readOnly ? "" : '<button type="button" class="link" data-action="g-new" data-level="90d" data-parent="' + esc(g.id) + '" data-q="' + q + '">+ Goal 90 hari</button>') + '</div>' +
-      (nine.length ? '<ul class="g90l">' + nine.map(function(n, j){
-        var r = rangeOf(n), wrote = S.glog.some(function(l){ return l.goal === n.id && l.date === t; }), p = progress(n);
-        var st = n.done ? "Tercapai ✓" : t < r.a ? "Mula " + untilTxt(r.a) : t > r.b ? "Pusingan tamat" : (wrote ? "✍️ Dah tulis hari ini" : "✍️ Belum tulis hari ini");
-        return '<li><button type="button" class="g90" data-action="g-open" data-id="' + esc(n.id) + '"><span class="gbadge sm">' + letter(j) + '</span><span class="g-main"><b>' + esc(n.title) + '</b><small>' + esc(st + " · " + logsOf(n.id).length + " catatan") + '</small>' +
-          '<span class="meter thin"><span class="meter-fill' + (p >= 1 ? " full" : "") + '" style="width:' + (p * 100).toFixed(1) + '%"></span></span></span><b class="g-pct">' + Math.round(p * 100) + '%</b><span aria-hidden="true">›</span></button></li>';
-      }).join("") + '</ul>' : '<p class="hint" style="margin:0">Tiada goal 90 hari lagi untuk pusingan ini.</p>') + '</div>';
+  function roundCard(rd, root, t){
+    var r = rangeOf(rd), n = logsOf(rd.id).length, active = inRange(r, t);
+    var wrote = S.glog.some(function(l){ return l.goal === rd.id && l.date === t; });
+    var cta = !active ? (t < r.a ? "📖 Lihat (" + n + " catatan)" : "📖 Lihat catatan (" + n + ")") : wrote ? "✍️ Belajar & Cuba · dah tulis hari ini ✓" : "✍️ Tulis Belajar & Cuba hari ini";
+    return '<p class="g-dates">' + longDate(r.a) + ' → ' + longDate(r.b) + ' · ' + whenTxt(r, t) + '</p>' + abHtml(rd) + whyHtml(rd) +
+      pbar(roundProg(root, rd.year, rd.q), timeFrac(r), "Goal 90 hari") +
+      '<div><button type="button" class="btn ' + (active && !wrote ? "primary" : "ghost") + '" data-action="g-open" data-id="' + esc(rd.id) + '">' + cta + '</button></div>';
   }
   function detailHtml(g, root, ri){
-    var t = todayStr(), r = rangeOf(g), one = planById(g.parent);
-    var oi = kids(root.id, function(x){ return x.level === "1y" && x.year === one.year; }).indexOf(one);
-    var ni = kids(one.id, function(x){ return x.q === g.q; }).indexOf(g);
+    var t = todayStr(), r = rangeOf(g), yd = yearDoc(root, g.year);
     var D = daysBetween(r.a, r.b) + 1, el = Math.min(Math.max(daysBetween(r.a, t) + 1, 0), D);
     var logs = logsOf(g.id).filter(function(l){ return inRange(r, l.date); });
     var rated = logs.map(function(l){ return Number(l.rating) || 0; }).filter(Boolean);
-    var when = t < r.a ? "mula " + untilTxt(r.a) : t > r.b ? "pusingan tamat" : "hari " + el + " daripada " + D + " · " + (D - el) + " hari lagi";
     return '<section class="panel gdet">' +
-      '<button type="button" class="link back" data-action="g-back">‹ Kembali ke Goal ' + letter(ri) + '</button>' +
-      '<span class="eyebrow">Goal ' + letter(ri) + ' › Tahun ' + (one.year + 1) + ' goal ' + letter(oi) + ' › 90 hari ' + (g.q + 1) + ' goal ' + letter(ni) + (g.done ? " · tercapai ✓" : "") + '</span>' +
-      '<div class="g-top"><h2 class="g-title">' + esc(g.title) + '</h2>' + editBtn(g) + '</div>' +
-      (g.why ? '<p class="g-why">' + esc(g.why) + '</p>' : "") +
-      '<p class="g-ctx">Untuk goal 1 tahun: <b>' + esc(one.title) + '</b><br>Untuk goal 3 tahun: <b>' + esc(root.title) + '</b></p>' +
-      '<p class="g-dates">' + longDate(r.a) + ' → ' + longDate(r.b) + ' · ' + when + '</p>' +
-      pbar(progress(g), timeFrac(r), "Goal 90 hari") +
+      '<button type="button" class="link back" data-action="g-back">‹ Kembali ke Goal ' + (ri + 1) + '</button>' +
+      '<div class="g-top"><span class="eyebrow">Goal ' + (ri + 1) + ' › Tahun ' + (g.year + 1) + ' › 90 hari ke-' + (g.q + 1) + '</span>' + editBtn(g) + '</div>' +
+      '<p class="g-dates">' + longDate(r.a) + ' → ' + longDate(r.b) + ' · ' + whenTxt(r, t) + '</p>' +
+      abHtml(g) + whyHtml(g) +
+      '<p class="g-ctx">' + (yd ? 'Goal Tahun ' + (g.year + 1) + ': <b>' + esc(yd.title) + '</b><br>' : "") + 'Goal 3 tahun: <b>' + esc(root.title) + '</b></p>' +
+      pbar(roundProg(root, g.year, g.q), timeFrac(r), "Goal 90 hari") +
       '<dl class="gstats"><div><dt>Hari ditulis</dt><dd>' + logs.length + '<small> / ' + el + '</small></dd></div>' +
         '<div><dt>Purata berjaya</dt><dd>' + (rated.length ? fmt1(avg(rated)) : "–") + '<small> / 5</small></dd></div>' +
         '<div><dt>Berturut-turut</dt><dd>' + streakOf(g) + '<small> hari</small></dd></div></dl>' +
-      '<p class="hint" style="margin:0">Kemajuan naik setiap hari anda tulis. Hari yang lebih berjaya beri lebih banyak: 5/5 = satu hari penuh, 3/5 = separuh lebih. Tulis setiap hari dengan 5/5 selama ' + D + ' hari = 100%.</p>' +
-      (S.readOnly ? "" : '<div><button type="button" class="btn ghost small" data-action="g-done" data-id="' + esc(g.id) + '">' + (g.done ? "Batal tanda tercapai" : "✓ Tandakan goal ini tercapai") + '</button></div>') +
+      '<p class="hint" style="margin:0">Kemajuan naik setiap hari anda tulis. Hari yang lebih berjaya beri lebih banyak: 5/5 = satu hari penuh. Tulis setiap hari dengan 5/5 selama ' + D + ' hari = 100%. Tanda bulatan Goal A bila ia tercapai.</p>' +
       '</section>';
   }
   function logsHtml(g){
@@ -2099,8 +2131,8 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
   }
   function openGoal(id, date){
     var g = planById(id); if (!g) return;
-    var r = rootOf(g); if (r && S.pv.root !== r.id) { S.pv.root = r.id; S.pv.year = null; S.pv.q = null; }
-    var one = planById(g.parent); if (one) { S.pv.year = one.year; S.pv.q = g.q; }
+    var r = rootOf(g); if (!r) return;
+    S.pv.root = r.id; S.pv.year = g.year; S.pv.q = g.q;
     S.pv.open = id; S.pv.delLog = null;
     if (document.body.dataset.tab !== "goal") goTab("goal"); else window.scrollTo(0, 0);
     render(); fillLog(g, date);
@@ -2124,23 +2156,29 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
     finally { $("glSave").disabled = false; }
   }
 
+  var PH = {
+    "3y":  ["cth. Jadi doktor bertauliah (tamat MBBS)", "cth. Lulus dengan baik dan dapat housemanship di hospital pilihan di Malaysia"],
+    "1y":  ["cth. Lulus semua exam tahun ini", "cth. Lulus dengan 70%+ dan siap satu projek research"],
+    "90d": ["cth. Habis ulang kaji Patologi sistemik", "cth. Habis Patologi + jawab 300 MCQ dengan skor 75%+"]
+  };
   function openGoalDlg(o){
     if (S.readOnly || !db) return;
     var g = o.id ? planById(o.id) : null;
     gDraft = g ? {id:g.id, level:g.level, parent:g.parent, year:g.year, q:g.q} : {id:null, level:o.level, parent:o.parent || "", year:Number(o.year) || 0, q:Number(o.q) || 0};
     gDelArm = false;
-    var lv = gDraft.level, ctx = "";
-    $("goalDlgTitle").textContent = g ? "Ubah goal " + LEVELS[lv] : "Goal " + LEVELS[lv] + " baru";
-    $("goTitle").value = g ? g.title : ""; $("goWhy").value = g ? g.why : "";
-    $("goTitle").placeholder = lv === "3y" ? "cth. Tamat MBBS dan lulus exam dengan baik" : lv === "1y" ? "cth. Lulus semua exam tahun ini pada cubaan pertama" : "cth. Habis ulang kaji Patologi sistemik + 300 MCQ";
-    $("goWhyLbl").innerHTML = (lv === "3y" ? "Kenapa goal ini penting bagi saya?" : lv === "1y" ? "Apa hasil yang saya mahu dalam setahun?" : "Bagaimana saya tahu saya berjaya?") + ' <span class="opt">(pilihan)</span>';
+    var lv = gDraft.level, root = lv === "3y" ? g : planById(gDraft.parent), ri = root ? roots().indexOf(root) : -1;
+    var what = lv === "3y" ? "3 tahun" : lv === "1y" ? "1 tahun · Tahun " + (gDraft.year + 1) : "90 hari · Tahun " + (gDraft.year + 1) + ", pusingan " + (gDraft.q + 1);
+    $("goalDlgTitle").textContent = (g ? "Ubah goal " : "Goal ") + what;
+    $("goNameWrap").hidden = lv !== "3y";
+    $("goName").value = g && lv === "3y" ? g.name : "";
+    $("goTitle").value = g ? g.title : ""; $("goTitleB").value = g ? g.titleB : ""; $("goWhy").value = g ? g.why : "";
+    $("goTitle").placeholder = PH[lv][0]; $("goTitleB").placeholder = PH[lv][1];
     $("goStartWrap").hidden = lv !== "3y";
     $("goStart").value = g && lv === "3y" ? g.start : todayStr();
-    if (lv === "1y") { var rt = planById(gDraft.parent); ctx = rt ? "Di bawah goal 3 tahun: " + rt.title + " · Tahun " + (gDraft.year + 1) : ""; }
-    if (lv === "90d") { var one = planById(gDraft.parent); ctx = one ? "Di bawah goal 1 tahun: " + one.title : ""; }
+    var ctx = lv !== "3y" && root ? "Untuk Goal " + (ri + 1) + ": " + (root.name || root.title) : "";
     $("goCtx").textContent = ctx; $("goCtx").hidden = !ctx;
     $("goDelete").hidden = !g; $("goDelete").textContent = "Padam";
-    showErr("goErr", ""); goalDates(); showDlg("goalDlg"); $("goTitle").focus();
+    showErr("goErr", ""); goalDates(); showDlg("goalDlg"); $(lv === "3y" && !g ? "goName" : "goTitle").focus();
   }
   function goalDates(){
     if (!gDraft) return;
@@ -2150,52 +2188,57 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
       var fake = {start:s}, q1 = qRange(fake, 0, 0);
       html = '<li class="big"><span>🎯 Sasaran 3 tahun</span><b>' + longDate(addDays(addYears(s, 3), -1)) + '</b></li>' +
         [0, 1, 2].map(function(i){ var r = yearRange(fake, i); return '<li><span>Tahun ' + (i + 1) + '</span><b>' + longDate(r.a) + ' – ' + longDate(r.b) + '</b></li>'; }).join("") +
-        '<li><span>⏱ 90 hari pertama</span><b>' + longDate(q1.a) + ' – ' + longDate(q1.b) + '</b></li>';
+        '<li><span>⏱ 90 hari pertama</span><b>' + longDate(q1.a) + ' – ' + longDate(q1.b) + '</b></li>' +
+        '<li><span>Jumlah pusingan 90 hari</span><b>12 (4 setiap tahun)</b></li>';
     } else if (lv === "1y") {
       var root = planById(gDraft.parent); if (!root) return;
       var yr = yearRange(root, gDraft.year);
       html = '<li class="big"><span>🎯 Tahun ' + (gDraft.year + 1) + '</span><b>' + longDate(yr.a) + ' – ' + longDate(yr.b) + '</b></li>' +
         [0, 1, 2, 3].map(function(i){ var r = qRange(root, gDraft.year, i); return '<li><span>90 hari ' + (i + 1) + '</span><b>' + longDate(r.a) + ' – ' + longDate(r.b) + '</b></li>'; }).join("");
     } else {
-      var one = planById(gDraft.parent), rt = one && rootOf(one); if (!rt) return;
-      var r9 = qRange(rt, one.year, gDraft.q);
-      html = '<li class="big"><span>🎯 Pusingan 90 hari ' + (gDraft.q + 1) + '</span><b>' + longDate(r9.a) + ' – ' + longDate(r9.b) + '</b></li>' +
+      var rt = planById(gDraft.parent); if (!rt) return;
+      var r9 = qRange(rt, gDraft.year, gDraft.q);
+      html = '<li class="big"><span>🎯 90 hari ke-' + (gDraft.q + 1) + ', Tahun ' + (gDraft.year + 1) + '</span><b>' + longDate(r9.a) + ' – ' + longDate(r9.b) + '</b></li>' +
         '<li><span>Tempoh</span><b>' + (daysBetween(r9.a, r9.b) + 1) + ' hari · tulis Belajar &amp; Cuba setiap hari</b></li>';
     }
     $("goDates").innerHTML = '<p class="hint" style="margin:0 0 6px">Tarikh dikira automatik:</p><ul class="godates">' + html + '</ul>';
   }
   function planBody(g){
-    var b = {level:g.level, parent:g.parent || "", title:g.title, why:g.why || "", done:!!g.done, createdAt:g.createdAt || new Date().toISOString(), updatedAt:new Date().toISOString()};
-    if (g.level === "3y") b.start = g.start; if (g.level === "1y") b.year = g.year; if (g.level === "90d") b.q = g.q;
+    var b = {v:2, level:g.level, parent:g.parent || "", name:g.name || "", title:g.title || "", titleB:g.titleB || "", why:g.why || "",
+      doneA:!!g.doneA, doneB:!!g.doneB, createdAt:g.createdAt || new Date().toISOString(), updatedAt:new Date().toISOString()};
+    if (g.level === "3y") b.start = g.start;
+    if (g.level === "1y" || g.level === "90d") b.year = g.year;
+    if (g.level === "90d") b.q = g.q;
     return b;
   }
   async function saveGoal(ev){
     ev.preventDefault();
     if (!gDraft || !db || S.readOnly) return;
-    var lv = gDraft.level, title = $("goTitle").value.trim(), why = $("goWhy").value.trim(), start = $("goStart").value;
-    if (!title) { showErr("goErr", "Tulis goal anda."); $("goTitle").focus(); return; }
+    var lv = gDraft.level, title = $("goTitle").value.trim(), titleB = $("goTitleB").value.trim(), why = $("goWhy").value.trim(), start = $("goStart").value, name = $("goName").value.trim();
+    if (!title) { showErr("goErr", "Tulis Goal A (yang asas)."); $("goTitle").focus(); return; }
     if (lv === "3y" && !isDate(start)) { showErr("goErr", "Pilih tarikh mula."); return; }
-    var prev = gDraft.id ? planById(gDraft.id) : null, isNew = !prev;
-    var id = gDraft.id || newId(lv === "3y" ? "p" : lv === "1y" ? "y" : "n");
-    var body = planBody({level:lv, parent:lv === "3y" ? "" : gDraft.parent, title:title.slice(0, 120), why:why.slice(0, 600), done:prev ? prev.done : false,
-      createdAt:prev ? prev.createdAt : null, start:start, year:gDraft.year, q:gDraft.q});
+    var prev = gDraft.id ? planById(gDraft.id) : null;
+    if (!prev && lv !== "3y") { var root = planById(gDraft.parent); if (root) prev = lv === "1y" ? yearDoc(root, gDraft.year) : roundDoc(root, gDraft.year, gDraft.q); }
+    var isNew = !prev, id = prev ? prev.id : newId(lv === "3y" ? "p" : lv === "1y" ? "y" : "n");
+    var body = planBody({level:lv, parent:lv === "3y" ? "" : gDraft.parent, name:lv === "3y" ? name.slice(0, 40) : "", title:title.slice(0, 160), titleB:titleB.slice(0, 160), why:why.slice(0, 600),
+      doneA:prev ? prev.doneA : false, doneB:prev ? prev.doneB : false, createdAt:prev ? prev.createdAt : null, start:start, year:gDraft.year, q:gDraft.q});
     try {
       await withRetry(function(){ return db.doc("plan/" + id).set(body); });
       hideDlg("goalDlg");
       if (isNew && lv === "3y") { S.pv.root = id; S.pv.year = null; S.pv.q = null; S.pv.open = null; }
       render();
-      toast(!isNew ? "Goal dikemas kini" : lv === "3y" ? "Goal 3 tahun dicipta. Tarikh setiap tahun dan 90 hari dah dikira." : lv === "1y" ? "Goal 1 tahun ditambah" : "Goal 90 hari ditambah. Mula tulis Belajar & Cuba hari ini!");
-      if (isNew && lv === "90d") openGoal(id);
+      toast(!isNew ? "Goal dikemas kini" : lv === "3y" ? "Goal 3 tahun dicipta. Tarikh setiap tahun dan 90 hari dah dikira." : lv === "1y" ? "Goal Tahun " + (gDraft.year + 1) + " disimpan" : "Goal 90 hari disimpan. Mula tulis Belajar & Cuba!");
     } catch (e) { showErr("goErr", writeErrMsg(e)); }
   }
   async function deleteGoal(){
     if (!gDraft || !gDraft.id || !db) return;
-    var ids = [gDraft.id];
-    for (var i = 0; i < ids.length; i++) kids(ids[i]).forEach(function(c){ ids.push(c.id); });
+    var g = planById(gDraft.id); if (!g) return;
+    var ids = [g.id];
+    if (g.level === "3y") S.plan.forEach(function(x){ if (x.parent === g.id) ids.push(x.id); });
     var logs = S.glog.filter(function(l){ return ids.indexOf(l.goal) >= 0; });
     if (!gDelArm) {
       gDelArm = true;
-      $("goDelete").textContent = ids.length > 1 || logs.length ? "Pasti? Termasuk " + (ids.length - 1) + " sub-goal & " + logs.length + " catatan" : "Pasti padam?";
+      $("goDelete").textContent = ids.length > 1 || logs.length ? "Pasti? Termasuk " + (ids.length > 1 ? (ids.length - 1) + " goal tahun/90 hari & " : "") + logs.length + " catatan" : "Pasti padam?";
       return;
     }
     try {
@@ -2205,10 +2248,64 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
       hideDlg("goalDlg"); render(); toast("Goal dipadam");
     } catch (e) { showErr("goErr", writeErrMsg(e)); }
   }
-  function toggleGoalDone(id){
+  function toggleGoalDone(id, slot){
     var g = planById(id); if (!g || !db || S.readOnly) return;
-    var body = planBody(Object.assign({}, g, {done:!g.done}));
-    withRetry(function(){ return db.doc("plan/" + id).set(body); }).then(function(){ toast(body.done ? "Tahniah! Goal tercapai 🎉" : "Tanda tercapai dibuang"); }).catch(function(e){ toast(writeErrMsg(e)); });
+    var patch = slot === "B" ? {doneB:!g.doneB} : {doneA:!g.doneA}, on = slot === "B" ? patch.doneB : patch.doneA;
+    var body = planBody(Object.assign({}, g, patch));
+    withRetry(function(){ return db.doc("plan/" + id).set(body); })
+      .then(function(){ toast(on ? (slot === "B" ? "Goal B tercapai! Luar biasa 🌟" : "Goal A tercapai! Tahniah 🎉") : "Tanda tercapai dibuang"); })
+      .catch(function(e){ toast(writeErrMsg(e)); });
+  }
+
+  // One-time move of goals saved by the first version of this tab (1-year goals nested under the 3-year goal,
+  // 90-day goals nested under a 1-year goal, several goals per period) into one A/B doc per period.
+  async function migratePlan(){
+    if (migrated || !planLoaded || !glogLoaded || !db || S.readOnly) return;
+    migrated = true;
+    var old = S.plan.filter(function(g){ return g.v !== 2; }); if (!old.length) return;
+    var byId = {}; S.plan.forEach(function(g){ byId[g.id] = g; });
+    var sets = {}, dels = [], moves = [];
+    function merged(list, extra){
+      var a = list[0], b = list[1], rest = list.slice(2);
+      var why = [a.why, b && b.why].filter(Boolean).join("\n");
+      if (rest.length) why += (why ? "\n" : "") + "Goal lain: " + rest.map(function(x){ return x.title; }).join("; ");
+      return planBody(Object.assign({level:a.level, name:"", title:a.title, titleB:b ? b.title : "", why:why.slice(0, 600), doneA:a.doneA, doneB:b ? b.doneA : false, createdAt:a.createdAt}, extra));
+    }
+    old.filter(function(g){ return g.level === "3y"; }).forEach(function(r){
+      sets[r.id] = planBody({level:"3y", parent:"", name:"", title:r.title, titleB:"", why:r.why, doneA:r.doneA, createdAt:r.createdAt, start:r.start});
+    });
+    var oneInfo = {}, g1 = {};
+    old.filter(function(g){ return g.level === "1y"; }).sort(byCreated).forEach(function(g){
+      oneInfo[g.id] = {root:g.parent, year:g.year};
+      var k = g.parent + "|" + g.year; (g1[k] = g1[k] || []).push(g);
+    });
+    Object.keys(g1).forEach(function(k){
+      var list = g1[k]; sets[list[0].id] = merged(list, {parent:list[0].parent, year:list[0].year});
+      list.slice(1).forEach(function(x){ dels.push(x.id); });
+    });
+    var g9 = {};
+    old.filter(function(g){ return g.level === "90d"; }).sort(byCreated).forEach(function(g){
+      var p = byId[g.parent], info = oneInfo[g.parent] || (p && p.v === 2 && p.level === "1y" ? {root:p.parent, year:p.year} : null);
+      if (!info) return;
+      var k = info.root + "|" + info.year + "|" + g.q; (g9[k] = g9[k] || {info:info, list:[]}).list.push(g);
+    });
+    Object.keys(g9).forEach(function(k){
+      var o = g9[k], keep = o.list[0];
+      sets[keep.id] = merged(o.list, {parent:o.info.root, year:o.info.year, q:keep.q});
+      o.list.slice(1).forEach(function(x){ dels.push(x.id); logsOf(x.id).forEach(function(l){ moves.push({l:l, to:keep.id}); }); });
+    });
+    try {
+      for (var id in sets) { var body = sets[id], pid = id; await withRetry(function(){ return db.doc("plan/" + pid).set(body); }); }
+      for (var i = 0; i < moves.length; i++) {
+        var l = moves[i].l, nid = moves[i].to + "_" + l.date, ex = S.glog.find(function(x){ return x.id === nid; });
+        var nb = {goal:moves[i].to, date:l.date, learn:[ex && ex.learn, l.learn].filter(Boolean).join("\n"), tried:[ex && ex.tried, l.tried].filter(Boolean).join("\n"),
+          rating:Math.max(ex ? ex.rating : 0, l.rating) || 3, createdAt:ex ? ex.createdAt : l.createdAt, updatedAt:new Date().toISOString()};
+        await withRetry(function(){ return db.doc("glog/" + nid).set(nb); });
+        if (!ex) S.glog.push(Object.assign({id:nid}, nb));
+        await withRetry(function(){ return db.doc("glog/" + l.id).delete(); });
+      }
+      for (var j = 0; j < dels.length; j++) { var did = dels[j]; await withRetry(function(){ return db.doc("plan/" + did).delete(); }); }
+    } catch (e) { toast("Goal lama tidak dapat disusun semula: " + writeErrMsg(e)); }
   }
 
   /* ---------- events ---------- */
@@ -2311,7 +2408,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
       else if (a === "g-q") { S.pv.q = Number(b.dataset.q); render(); }
       else if (a === "g-open") openGoal(b.dataset.id, b.dataset.date);
       else if (a === "g-back") { S.pv.open = null; S.pv.delLog = null; render(); window.scrollTo(0, 0); }
-      else if (a === "g-done") toggleGoalDone(b.dataset.id);
+      else if (a === "g-done") toggleGoalDone(b.dataset.id, b.dataset.slot);
       else if (a === "gl-edit") { var og = planById(S.pv.open); if (og) { fillLog(og, b.dataset.date); $("glogPanel").scrollIntoView({behavior:"smooth", block:"start"}); } }
       else if (a === "gl-del") { S.pv.delLog = b.dataset.id; render(); }
       else if (a === "gl-del-no") { S.pv.delLog = null; render(); }
@@ -2375,10 +2472,11 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
     db.collection("plan").onSnapshot(function(snap){
       S.plan = snap.docs.map(function(d){
         var x = d.data() || {};
-        return {id:d.id, level:LEVELS[x.level] ? x.level : "", parent:String(x.parent || ""), title:String(x.title || ""), why:String(x.why || ""), done:!!x.done,
-          start:String(x.start || ""), year:Math.min(Math.max(Number(x.year) || 0, 0), 2), q:Math.min(Math.max(Number(x.q) || 0, 0), 3), createdAt:x.createdAt || "", updatedAt:x.updatedAt || ""};
+        return {id:d.id, v:Number(x.v) || 0, level:LEVELS[x.level] ? x.level : "", parent:String(x.parent || ""), name:String(x.name || ""), title:String(x.title || ""), titleB:String(x.titleB || ""),
+          why:String(x.why || ""), doneA:!!(x.doneA || x.done), doneB:!!x.doneB, start:String(x.start || ""),
+          year:Math.min(Math.max(Number(x.year) || 0, 0), 2), q:Math.min(Math.max(Number(x.q) || 0, 0), 3), createdAt:x.createdAt || "", updatedAt:x.updatedAt || ""};
       }).filter(function(g){ return g.level && g.title; });
-      render();
+      planLoaded = true; render(); migratePlan();
     }, function(){});
     db.collection("glog").onSnapshot(function(snap){
       S.glog = snap.docs.map(function(d){
@@ -2386,7 +2484,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
         return {id:d.id, goal:String(x.goal || ""), date:String(x.date || ""), learn:String(x.learn || ""), tried:String(x.tried || ""),
           rating:Math.min(Math.max(Math.round(Number(x.rating) || 0), 0), 5), createdAt:x.createdAt || "", updatedAt:x.updatedAt || ""};
       }).filter(function(l){ return l.goal && isDate(l.date); });
-      render();
+      glogLoaded = true; render(); migratePlan();
     }, function(){});
   }
 
