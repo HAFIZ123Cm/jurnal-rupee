@@ -54,11 +54,11 @@ mainScript = mustReplace(mainScript,
 
 // Music tab (PWA only)
 mainScript = mustReplace(mainScript,
-  'var TABS = ["hari", "belanja", "bajet", "diet", "resepi"];',
-  'var TABS = ["hari", "belanja", "bajet", "diet", "resepi", "jurnal", "muzik"];',
+  'var TABS = ["hari", "belanja", "goal", "diet", "resepi"];',
+  'var TABS = ["hari", "belanja", "goal", "diet", "resepi", "jurnal", "muzik"];',
   "tabs list");
 bodyPart = mustReplace(bodyPart,
-  '  <div class="view two" data-view="bajet" hidden>',
+  '  <div class="view" data-view="diet" hidden>',
   `  <div class="view" data-view="jurnal" hidden>
     <section class="panel">
       <div class="panel-head"><h2 id="jFormTitle">Tulis hari ini</h2><span id="jStreak" class="meta"></span></div>
@@ -126,7 +126,7 @@ bodyPart = mustReplace(bodyPart,
     </section>
   </div>
 
-  <div class="view two" data-view="bajet" hidden>`,
+  <div class="view" data-view="diet" hidden>`,
   "music view");
 bodyPart = mustReplace(bodyPart,
   '<path d="M6 16.5h12"/></svg>Resepi</button>',
@@ -172,7 +172,7 @@ img{max-width:100%}
 .tabbar-in{grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:5px}
 .tabbtn{font-size:.6rem;min-width:0;padding:8px 1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tabbtn svg{width:21px;height:21px}
-body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
+body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab="goal"] .cyclebar{display:none}
 .jform{display:flex;flex-direction:column;gap:12px}
 .jrow{display:flex;align-items:center;gap:10px}
 .jrow input{width:auto;flex:1}

@@ -284,7 +284,7 @@ dialog::backdrop{background:rgba(14,12,24,.55)}
 .roundbtn svg{width:20px;height:20px}
 .roundbtn:disabled{opacity:.5;cursor:not-allowed}
 .cyclebar{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-body[data-tab="hari"] .cyclebar,body[data-tab="diet"] .cyclebar,body[data-tab="resepi"] .cyclebar{display:none}
+body[data-tab="hari"] .cyclebar,body[data-tab="diet"] .cyclebar,body[data-tab="resepi"] .cyclebar,body[data-tab="goal"] .cyclebar{display:none}
 .view{display:flex;flex-direction:column;gap:16px;min-width:0}
 @media (min-width:860px){.view.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);align-items:start}.view.two > .span2{grid-column:1/-1}}
 .panel,.summary{border-radius:20px;box-shadow:var(--shadow)}
@@ -347,6 +347,126 @@ body.timing .toast{bottom:calc(250px + env(safe-area-inset-bottom,0px))}
   .today-facts dd{font-size:.9rem}
 }
 @media (prefers-reduced-motion: reduce){.meter-fill,.cat-fill{transition:none}}
+/* daily goals grouped by time of day */
+.slot-h{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:8px;padding:2px 4px;font-size:.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.slot-h:first-child{margin-top:0}
+.slot-h em{font-style:normal;margin-left:6px;padding:2px 7px;border-radius:999px;background:var(--accent);color:var(--accent-ink);font-size:.6rem;letter-spacing:.04em;vertical-align:1px}
+.slot-h small{font-family:var(--f-num);font-weight:500;letter-spacing:0;font-size:.74rem}
+.slot-h.now{color:var(--accent)}
+.slot-empty{padding:0 4px}
+.slot-empty .link{font-weight:500;color:var(--muted)}
+.addgoal{flex-wrap:wrap;align-items:center}
+.addgoal select{width:auto;flex:none;padding:8px 6px;font-size:.85rem}
+.addgoal input[type="text"]{flex:1 1 100px}
+.grep{display:flex;align-items:center;gap:6px;width:100%;font-weight:500;font-size:.8rem;color:var(--muted);cursor:pointer}
+.grep input{width:16px;height:16px;margin:0;accent-color:var(--accent);flex:none}
+.goal.auto.todo .mark{background:var(--accent-soft);color:var(--accent)}
+.goal .linkish{flex:1;min-width:0;background:none;border:0;padding:0;font:inherit;text-align:left;cursor:pointer;overflow-wrap:anywhere;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+.goal.auto.ok .linkish{color:var(--ok)}
+.goal.auto.todo .linkish{color:var(--accent)}
+/* calendar */
+.calnav{display:flex;align-items:center;gap:6px}
+.calnav b{font-family:var(--f-display);font-size:1.05rem;min-width:8.5em;text-align:center}
+.calnav .link{margin-left:auto}
+.calgrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px}
+.cal-h{text-align:center;font-size:.68rem;font-weight:700;color:var(--muted);padding:2px 0}
+.cal-d{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:46px;padding:7px 0 8px;border:1px solid transparent;border-radius:10px;background:var(--bg);color:var(--ink);font:500 .85rem/1 var(--f-num);cursor:pointer}
+.cal-d:hover{border-color:var(--line)}
+.cal-d b{font-weight:500;padding:3px 6px;margin-top:-3px;border-radius:999px}
+.cal-d.today b{background:var(--accent);color:var(--accent-ink)}
+.cal-d.sel{border-color:var(--accent);background:var(--accent-soft)}
+.cal-d.proj::after{content:"";position:absolute;left:4px;right:4px;bottom:3px;height:3px;border-radius:2px;background:var(--warn);opacity:.75}
+.cal-dots{display:flex;gap:2px;height:6px}
+.cal-dots i{width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.cal-dots i.k-acara{background:var(--ok)}
+.cal-dots i.k-due{background:var(--over);border-radius:1px}
+.cal-dots i.done{opacity:.3}
+.cal-legend{display:flex;gap:4px 12px;flex-wrap:wrap;font-size:.72rem;color:var(--muted);margin:0}
+.cal-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;background:var(--accent)}
+.cal-legend i.k-acara{background:var(--ok)}
+.cal-legend i.k-proj{width:14px;height:3px;border-radius:2px;background:var(--warn);vertical-align:2px}
+.cal-legend i.k-due{border-radius:1px;background:var(--over)}
+.agsec{display:flex;flex-direction:column;gap:6px}
+.agsec h3{margin:0;font-size:.76rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.agsec h3.late-h{color:var(--over)}
+.agl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.ag{display:flex;align-items:flex-start;gap:10px;padding:8px 10px;border-radius:10px;background:var(--bg);border-left:3px solid var(--accent)}
+.ag.k-projek{border-left-color:var(--warn)}
+.ag.k-acara{border-left-color:var(--ok)}
+.ag.late{background:var(--over-soft)}
+.ag input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:var(--accent)}
+.agicon{width:18px;flex:none;text-align:center}
+.ag-b{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.ag-t{font-weight:600;overflow-wrap:anywhere}
+.ag small{color:var(--muted);font-size:.76rem;overflow-wrap:anywhere}
+.ag.late small{color:var(--over)}
+.ag.done .ag-t{text-decoration:line-through;color:var(--muted)}
+/* goal tab */
+.plan{display:flex;flex-direction:column;gap:16px;min-width:0}
+.gintro p{margin:0;color:var(--muted);line-height:1.55}
+.gintro h2{margin:0}
+.subtabs{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 4px;scrollbar-width:none}
+.subtabs::-webkit-scrollbar{display:none}
+.subtab{flex:none;max-width:13em;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:8px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;text-align:left;box-shadow:var(--shadow)}
+.subtab b{font-size:.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.subtab span{font-size:.86rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.subtab[aria-selected="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.subtab[aria-selected="true"] b{color:var(--accent)}
+.subtab.add{justify-content:center;color:var(--accent);font-weight:600;font-size:.85rem;border-style:dashed;box-shadow:none}
+.g-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.g-title{margin:0;font-size:1.3rem;overflow-wrap:anywhere}
+.g-why{margin:0;color:var(--muted);font-size:.9rem;white-space:pre-wrap;overflow-wrap:anywhere}
+.g-dates{margin:0;font-family:var(--f-num);font-size:.78rem;color:var(--muted)}
+.g-ctx{margin:0;font-size:.84rem;color:var(--muted);line-height:1.55}
+.g-ctx b{color:var(--ink);font-weight:600}
+.pbar{display:flex;align-items:center;gap:10px}
+.pbar .meter{flex:1}
+.pbar > b{font-family:var(--f-num);font-size:.85rem;min-width:3.2em;text-align:right}
+.meter-fill.full{background:var(--ok)}
+.gyears,.gqs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.gqs{grid-template-columns:repeat(4,minmax(0,1fr))}
+.gchip{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:8px 8px;border:1px solid var(--line);border-radius:12px;background:var(--field);color:var(--ink);font:inherit;cursor:pointer;text-align:left;min-width:0}
+.gchip b{font-size:.8rem}
+.gchip b em{display:block;font-style:normal;font-size:.6rem;color:var(--accent);text-transform:uppercase;letter-spacing:.05em}
+.gchip small{font-family:var(--f-num);font-size:.64rem;color:var(--muted);line-height:1.35}
+.gchip.sel{border-color:var(--accent);background:var(--accent-soft)}
+.gone{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:14px;background:var(--bg)}
+.g-row{display:flex;align-items:flex-start;gap:10px}
+.gbadge{width:28px;height:28px;flex:none;border-radius:8px;display:grid;place-items:center;background:var(--accent);color:var(--accent-ink);font:700 .85rem/1 var(--f-display)}
+.gbadge.sm{width:24px;height:24px;font-size:.75rem;background:var(--accent-soft);color:var(--accent)}
+.g-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.g-main b{overflow-wrap:anywhere}
+.g-main small{color:var(--muted);font-size:.76rem}
+.g90h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.g90h .link{text-transform:none;letter-spacing:0;font-size:.8rem}
+.g90l{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.g90{width:100%;display:flex;align-items:center;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.g90:hover{border-color:var(--accent)}
+.g90 .meter{display:block;margin-top:5px}
+.g90 .meter-fill{display:block}
+.g-pct{font-family:var(--f-num);font-size:.85rem}
+.gstats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0}
+.gstats div{background:var(--bg);border-radius:10px;padding:8px 10px;min-width:0}
+.gstats dt{font-size:.7rem;color:var(--muted)}
+.gstats dd{margin:0;font-family:var(--f-num);font-weight:600;font-size:1.1rem}
+.gstats small{font-size:.72rem;color:var(--muted);font-weight:400}
+.back{align-self:flex-start;padding-left:0;font-size:.85rem}
+.godates{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.godates li{display:flex;justify-content:space-between;gap:2px 10px;flex-wrap:wrap;padding:7px 10px;border-radius:8px;background:var(--bg);font-size:.82rem}
+.godates li b{font-family:var(--f-num);font-weight:500}
+.godates li.big{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.dlgform{padding:18px;gap:14px}
+.btn.danger{color:var(--over)}
+.dlg-actions .danger{margin-right:auto}
+.glogs{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.glog{padding:10px 12px;border-radius:12px;background:var(--bg);display:flex;flex-direction:column;gap:6px}
+.gl-h{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:.84rem}
+.gl-h b{margin-right:auto}
+.gl-r{font-family:var(--f-num);font-size:.78rem;color:var(--accent)}
+.glog p{margin:0;white-space:pre-wrap;overflow-wrap:anywhere;font-size:.9rem;line-height:1.5}
+.glog p span{display:block;font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.rate label{padding:7px 11px}
+@media (max-width:420px){.gstats dd{font-size:1rem}.gchip{padding:7px 6px}}
 </style>
 <style>
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -359,7 +479,7 @@ img{max-width:100%}
 .tabbar-in{grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;padding:5px}
 .tabbtn{font-size:.6rem;min-width:0;padding:8px 1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .tabbtn svg{width:21px;height:21px}
-body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
+body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab="goal"] .cyclebar{display:none}
 .jform{display:flex;flex-direction:column;gap:12px}
 .jrow{display:flex;align-items:center;gap:10px}
 .jrow input{width:auto;flex:1}
@@ -432,57 +552,33 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
 
   <div class="view" data-view="hari">
     <section id="today" class="today" aria-live="polite"><div class="sum-loading">Memuatkan hari ini…</div></section>
+    <section id="agenda" class="panel agenda" hidden></section>
   </div>
 
-  <div class="view" data-view="diet" hidden>
-    <section id="diet" class="panel" hidden></section>
-  </div>
-
-  <div class="view" data-view="resepi" hidden>
-    <section id="recipes" class="panel"></section>
-    <section id="sauces" class="panel"></section>
-  </div>
-
-  <div class="view two" data-view="belanja" hidden>
-      <section class="panel" id="entryPanel">
-        <div class="panel-head"><h2 id="formTitle">Tambah perbelanjaan</h2></div>
-        <form id="entryForm" novalidate>
-          <div class="field">
-            <label for="fAmount">Jumlah</label>
-            <div class="amount-wrap"><span aria-hidden="true">₹</span><input id="fAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" autocomplete="off"></div>
+  <div class="view" data-view="goal" hidden>
+    <div id="plan" class="plan"></div>
+    <section id="glogPanel" class="panel" hidden>
+      <div class="panel-head"><h2 id="glogHead">Belajar &amp; Cuba hari ini</h2></div>
+      <form id="glogForm" novalidate>
+        <div class="field"><label for="glDate">Tarikh</label><input id="glDate" type="date"></div>
+        <div class="field"><label for="glLearn">📚 Apa yang saya belajar hari ini</label><textarea id="glLearn" rows="3" maxlength="4000" placeholder="Satu perkara baru yang saya faham hari ini…"></textarea></div>
+        <div class="field"><label for="glTry">🧪 Apa yang saya cuba / buat hari ini</label><textarea id="glTry" rows="3" maxlength="4000" placeholder="Langkah kecil yang saya ambil ke arah goal ini…"></textarea></div>
+        <fieldset class="field">
+          <legend>Sejauh mana saya berjaya hari ini?</legend>
+          <div class="chips rate">
+            <input type="radio" name="glRate" id="gr1" value="1"><label for="gr1">1 😣</label>
+            <input type="radio" name="glRate" id="gr2" value="2"><label for="gr2">2 😕</label>
+            <input type="radio" name="glRate" id="gr3" value="3"><label for="gr3">3 😐</label>
+            <input type="radio" name="glRate" id="gr4" value="4"><label for="gr4">4 🙂</label>
+            <input type="radio" name="glRate" id="gr5" value="5"><label for="gr5">5 🔥</label>
           </div>
-          <div class="row2">
-            <div class="field"><label for="fCat">Kategori</label><select id="fCat"></select></div>
-            <div class="field"><label for="fDate">Tarikh</label><input id="fDate" type="date"></div>
-          </div>
-          <div class="field"><label for="fNote">Nota <span class="opt">(pilihan)</span></label><input id="fNote" type="text" maxlength="120" placeholder="cth. ayam 1 kg, auto ke hospital" autocomplete="off"></div>
-          <fieldset class="field">
-            <legend>Cara bayar</legend>
-            <div class="chips">
-              <input type="radio" name="method" id="mUPI" value="UPI" checked><label for="mUPI">UPI</label>
-              <input type="radio" name="method" id="mTunai" value="Tunai"><label for="mTunai">Tunai</label>
-              <input type="radio" name="method" id="mKad" value="Kad"><label for="mKad">Kad</label>
-            </div>
-          </fieldset>
-          <p id="formError" class="form-error" hidden></p>
-          <div class="form-actions">
-            <button id="submitBtn" class="btn primary" type="submit">Tambah</button>
-            <button id="cancelEdit" class="btn ghost" type="button" hidden>Batal</button>
-          </div>
-        </form>
-      </section>
-
-      <section class="panel">
-        <div class="panel-head">
-          <h2 id="listTitle">Rekod</h2>
-          <div class="head-actions">
-            <button id="clearFilter" class="filterchip" type="button" hidden></button>
-            <button id="csvBtn" class="btn ghost small" type="button" hidden>Muat turun CSV</button>
-          </div>
-        </div>
-        <div id="txList"></div>
-      </section>
-
+          <p class="hint" style="margin:6px 0 0">1 = sikit sangat · 3 = separuh jalan · 5 = berjaya penuh</p>
+        </fieldset>
+        <p id="glErr" class="form-error" hidden></p>
+        <div class="form-actions"><button type="submit" id="glSave" class="btn primary">Simpan catatan</button></div>
+      </form>
+    </section>
+    <div id="planLogs"></div>
   </div>
 
   <div class="view" data-view="jurnal" hidden>
@@ -552,8 +648,56 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
     </section>
   </div>
 
-  <div class="view two" data-view="bajet" hidden>
-    <section id="summary" class="summary span2"><div class="sum-loading">Memuatkan bajet…</div></section>
+  <div class="view" data-view="diet" hidden>
+    <section id="diet" class="panel" hidden></section>
+  </div>
+
+  <div class="view" data-view="resepi" hidden>
+    <section id="recipes" class="panel"></section>
+    <section id="sauces" class="panel"></section>
+  </div>
+
+  <div class="view two" data-view="belanja" hidden>
+      <section id="summary" class="summary span2"><div class="sum-loading">Memuatkan bajet…</div></section>
+      <section class="panel" id="entryPanel">
+        <div class="panel-head"><h2 id="formTitle">Tambah perbelanjaan</h2></div>
+        <form id="entryForm" novalidate>
+          <div class="field">
+            <label for="fAmount">Jumlah</label>
+            <div class="amount-wrap"><span aria-hidden="true">₹</span><input id="fAmount" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" autocomplete="off"></div>
+          </div>
+          <div class="row2">
+            <div class="field"><label for="fCat">Kategori</label><select id="fCat"></select></div>
+            <div class="field"><label for="fDate">Tarikh</label><input id="fDate" type="date"></div>
+          </div>
+          <div class="field"><label for="fNote">Nota <span class="opt">(pilihan)</span></label><input id="fNote" type="text" maxlength="120" placeholder="cth. ayam 1 kg, auto ke hospital" autocomplete="off"></div>
+          <fieldset class="field">
+            <legend>Cara bayar</legend>
+            <div class="chips">
+              <input type="radio" name="method" id="mUPI" value="UPI" checked><label for="mUPI">UPI</label>
+              <input type="radio" name="method" id="mTunai" value="Tunai"><label for="mTunai">Tunai</label>
+              <input type="radio" name="method" id="mKad" value="Kad"><label for="mKad">Kad</label>
+            </div>
+          </fieldset>
+          <p id="formError" class="form-error" hidden></p>
+          <div class="form-actions">
+            <button id="submitBtn" class="btn primary" type="submit">Tambah</button>
+            <button id="cancelEdit" class="btn ghost" type="button" hidden>Batal</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2 id="listTitle">Rekod</h2>
+          <div class="head-actions">
+            <button id="clearFilter" class="filterchip" type="button" hidden></button>
+            <button id="csvBtn" class="btn ghost small" type="button" hidden>Muat turun CSV</button>
+          </div>
+        </div>
+        <div id="txList"></div>
+      </section>
+
     <section class="panel">
       <div class="panel-head"><h2>Ikut kategori</h2><span id="catFoot" class="meta"></span></div>
       <div id="catList" class="catlist"></div>
@@ -571,7 +715,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
   <div class="tabbar-in">
     <button type="button" class="tabbtn" data-action="tab" data-tab="hari"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="m8 12.5 2.7 2.7L16 9.8"/></svg>Hari ini</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="belanja"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Belanja</button>
-    <button type="button" class="tabbtn" data-action="tab" data-tab="bajet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 3.1A9 9 0 1 0 20.9 13H11z"/><path d="M14 3.2a9 9 0 0 1 6.8 6.8H14z"/></svg>Bajet</button>
+    <button type="button" class="tabbtn" data-action="tab" data-tab="goal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>Goal</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="diet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11h18a9 9 0 0 1-18 0z"/><path d="M8 7.5c0-1.5 1-2 1-3.5M12 7.5c0-1.5 1-2 1-3.5M16 7.5c0-1.5 1-2 1-3.5"/></svg>Diet</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="resepi"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 13.9A4 4 0 0 1 7 6.1a5 5 0 0 1 10 0 4 4 0 0 1 1 7.8V20H6z"/><path d="M6 16.5h12"/></svg>Resepi</button>
     <button type="button" class="tabbtn" data-action="tab" data-tab="jurnal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19v-3"/><path d="M9 8h6M9 11.5h4"/></svg>Jurnal</button>
@@ -609,9 +753,9 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
     <div class="dlg-sec">
       <div class="field">
         <label for="sGoals">Matlamat harian <span class="opt">(satu baris satu matlamat)</span></label>
-        <textarea id="sGoals" rows="5"></textarea>
+        <textarea id="sGoals" rows="6"></textarea>
       </div>
-      <p class="hint">Matlamat "Belanja tak lebih had harian" ditanda sendiri secara automatik.</p>
+      <p class="hint">Tulis waktu di depan supaya matlamat masuk kumpulan yang betul: <b>Pagi:</b>, <b>Tengah hari:</b>, <b>Petang:</b> atau <b>Malam:</b>. Contoh: "Pagi: Solat Subuh dan ulang kaji 30 minit". Tanpa waktu = Sepanjang hari. Matlamat "Belanja tak lebih had harian" ditanda sendiri secara automatik.</p>
     </div>
 
     <div class="dlg-sec">
@@ -634,6 +778,50 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
     <div class="dlg-actions">
       <button type="button" id="cancelSettings" class="btn ghost">Batal</button>
       <button type="submit" id="saveSettings" class="btn primary">Simpan tetapan</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="calDlg" aria-labelledby="calDlgTitle">
+  <form id="calForm" class="dlgform" novalidate>
+    <div class="dlg-head"><h2 id="calDlgTitle">Tambah ke kalendar</h2><button type="button" class="iconbtn" data-close aria-label="Tutup">×</button></div>
+    <fieldset class="field">
+      <legend>Jenis</legend>
+      <div class="chips">
+        <input type="radio" name="calKind" id="ck1" value="tugas" checked><label for="ck1">✅ Tugas</label>
+        <input type="radio" name="calKind" id="ck2" value="projek"><label for="ck2">📌 Projek</label>
+        <input type="radio" name="calKind" id="ck3" value="acara"><label for="ck3">📅 Acara</label>
+      </div>
+    </fieldset>
+    <div class="field"><label for="calTitle">Apa?</label><input id="calTitle" type="text" maxlength="100" autocomplete="off" placeholder="cth. Hantar assignment Patologi"></div>
+    <div class="row2">
+      <div class="field"><label for="calDate" id="calDateLbl">Tarikh</label><input id="calDate" type="date"></div>
+      <div class="field"><label for="calTime">Masa <span class="opt">(pilihan)</span></label><input id="calTime" type="time"></div>
+    </div>
+    <div class="field" id="calEndWrap" hidden><label for="calEnd">Tarikh akhir / deadline</label><input id="calEnd" type="date"></div>
+    <div class="field"><label for="calNote">Nota <span class="opt">(pilihan)</span></label><textarea id="calNote" rows="2" maxlength="500"></textarea></div>
+    <p id="calErr" class="form-error" hidden></p>
+    <div class="dlg-actions">
+      <button type="button" id="calDelete" class="btn ghost danger" hidden>Padam</button>
+      <button type="button" class="btn ghost" data-close>Batal</button>
+      <button type="submit" class="btn primary">Simpan</button>
+    </div>
+  </form>
+</dialog>
+
+<dialog id="goalDlg" aria-labelledby="goalDlgTitle">
+  <form id="goalForm" class="dlgform" novalidate>
+    <div class="dlg-head"><h2 id="goalDlgTitle">Goal baru</h2><button type="button" class="iconbtn" data-close aria-label="Tutup">×</button></div>
+    <p id="goCtx" class="hint" hidden></p>
+    <div class="field"><label for="goTitle">Goal</label><input id="goTitle" type="text" maxlength="120" autocomplete="off"></div>
+    <div class="field"><label for="goWhy" id="goWhyLbl">Kenapa goal ini penting?</label><textarea id="goWhy" rows="2" maxlength="600"></textarea></div>
+    <div class="field" id="goStartWrap"><label for="goStart">Mula pada</label><input id="goStart" type="date"></div>
+    <div id="goDates"></div>
+    <p id="goErr" class="form-error" hidden></p>
+    <div class="dlg-actions">
+      <button type="button" id="goDelete" class="btn ghost danger" hidden>Padam</button>
+      <button type="button" class="btn ghost" data-close>Batal</button>
+      <button type="submit" class="btn primary">Simpan</button>
     </div>
   </form>
 </dialog>
@@ -785,16 +973,17 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
       {id:"simpanan",  name:"Simpanan",                 alloc:2600}
     ],
     dailyGoals: [
-      {id:"g1", text:"Masak sendiri: ayam + nasi"},
-      {id:"g2", text:"Tiada makan luar"},
-      {id:"g3", text:"Rekod semua belanja hari ini"},
-      {id:"g4", text:"Belajar / ulang kaji"}
+      {id:"g1", text:"Masak sendiri: ayam + nasi", slot:"tengahari"},
+      {id:"g4", text:"Belajar / ulang kaji", slot:"petang"},
+      {id:"g2", text:"Tiada makan luar", slot:"malam"},
+      {id:"g3", text:"Rekod semua belanja hari ini", slot:"malam"}
     ]
   };
 
   var db = null, downloads = null;
   var S = {
     settings: undefined, expenses: [], goals: {}, diet: undefined,
+    agenda: [], plan: [], glog: [], cal: {month:null, sel:null}, pv: {root:null, year:null, q:null, open:null, delLog:null},
     view: null, filter: null, editing: null, confirmDel: null,
     goalDay: null, readOnly: false, noDb: false, slow: false, dbError: null, formCycle: null, busy: false
   };
@@ -850,7 +1039,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
       cycleStartDay: Number(d.cycleStartDay) || 1,
       balance: bal,
       categories: Array.isArray(d.categories) ? d.categories.filter(function(c){ return c && c.id; }).map(function(c){ return {id:String(c.id), name:String(c.name || "Tanpa nama"), alloc:Number(c.alloc) || 0}; }) : [],
-      dailyGoals: Array.isArray(d.dailyGoals) ? d.dailyGoals.filter(function(g){ return g && g.id && g.text; }).map(function(g){ return {id:String(g.id), text:String(g.text)}; }) : []
+      dailyGoals: Array.isArray(d.dailyGoals) ? d.dailyGoals.filter(function(g){ return g && g.id && g.text; }).map(function(g){ return {id:String(g.id), text:String(g.text), slot:slotById(g.slot) ? g.slot : ""}; }) : []
     };
   }
   function settingsBody(s){
@@ -962,8 +1151,9 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
   }
 
   /* ---------- tabs ---------- */
-  var TABS = ["hari", "belanja", "bajet", "diet", "resepi", "jurnal", "muzik"];
+  var TABS = ["hari", "belanja", "goal", "diet", "resepi", "jurnal", "muzik"];
   function showTab(t){
+    if (t === "bajet") t = "belanja";
     if (TABS.indexOf(t) < 0) t = "hari";
     document.body.dataset.tab = t;
     document.querySelectorAll(".view").forEach(function(v){ v.hidden = v.dataset.view !== t; });
@@ -1204,7 +1394,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
     $("monthLabel").textContent = S.view ? cycleLabel(S.view) : "…";
     $("todayBtn").hidden = !S.view || S.view === cur;
     $("prevMonth").disabled = !S.view; $("nextMonth").disabled = !S.view;
-    renderNotice(); renderToday(); renderDiet(); renderSummary(); renderCatSelect(); renderCats(); renderList(); renderHistory(); renderFormState();
+    renderNotice(); renderToday(); renderAgenda(); renderPlan(); renderDiet(); renderSummary(); renderCatSelect(); renderCats(); renderList(); renderHistory(); renderFormState();
   }
 
   function renderNotice(){
@@ -1224,8 +1414,8 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
     if (S.settings === null) {
       el.hidden = false;
       el.innerHTML = '<div class="today-money"><span class="eyebrow">Mula di sini</span><h2 style="margin:6px 0 4px">Belum ada bajet</h2>' +
-        '<p class="limit-cap">Pergi ke tab Bajet untuk guna templat ₹20,000 atau import fail data anda.</p>' +
-        '<div class="hero-actions" style="margin-top:12px"><button type="button" class="btn hero-btn" data-action="tab" data-tab="bajet">Buka Bajet</button></div></div>';
+        '<p class="limit-cap">Pergi ke tab Belanja untuk guna templat ₹20,000 atau import fail data anda.</p>' +
+        '<div class="hero-actions" style="margin-top:12px"><button type="button" class="btn hero-btn" data-action="tab" data-tab="belanja">Buka Belanja</button></div></div>';
       return;
     }
     el.hidden = false;
@@ -1260,18 +1450,35 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
       var dmet = dt.gk >= tk * 0.95 && dt.gp >= tp;
       items += '<li class="goal auto ' + (dmet ? "ok" : "bad") + '"><span class="mark" aria-hidden="true">' + (dmet ? "✓" : "…") + '</span><span class="t">Diet: ' + nf0.format(dt.gk) + '/' + nf0.format(tk) + ' kcal · ' + fmt1(dt.gp) + '/' + nf0.format(tp) + ' g protein</span></li>';
     }
+    activeNineties(gd).forEach(function(g){
+      var w = S.glog.some(function(l){ return l.goal === g.id && l.date === gd; });
+      items += '<li class="goal auto ' + (w ? "ok" : "todo") + '"><span class="mark" aria-hidden="true">' + (w ? "✓" : "✍") + '</span><button type="button" class="t linkish" data-action="g-open" data-id="' + esc(g.id) + '" data-date="' + gd + '">Belajar &amp; Cuba: ' + esc(g.title) + (w ? "" : " · belum tulis") + '</button></li>';
+    });
+    // recurring + one-day goals, grouped into morning / midday / evening / night
+    var groups = {"": {html:"", n:0, t:0}};
+    SLOTS.forEach(function(s){ groups[s.id] = {html:"", n:0, t:0}; });
     gs.rec.forEach(function(g){
-      var on = !!gs.done[g.id], id = "g-" + gd + "-" + g.id;
-      items += '<li class="goal' + (on ? " done" : "") + '"><input type="checkbox" id="' + esc(id) + '" data-goal="' + esc(g.id) + '" data-kind="rec"' + (on ? " checked" : "") + (S.readOnly ? " disabled" : "") + '><label for="' + esc(id) + '">' + esc(g.text) + '</label></li>';
+      var on = !!gs.done[g.id], id = "g-" + gd + "-" + g.id, grp = groups[slotById(g.slot) ? g.slot : ""];
+      grp.t++; if (on) grp.n++;
+      grp.html += '<li class="goal' + (on ? " done" : "") + '"><input type="checkbox" id="' + esc(id) + '" data-goal="' + esc(g.id) + '" data-kind="rec"' + (on ? " checked" : "") + (S.readOnly ? " disabled" : "") + '><label for="' + esc(id) + '">' + esc(g.text) + '</label></li>';
     });
     gs.extras.forEach(function(x){
-      var id = "gx-" + gd + "-" + x.id;
-      items += '<li class="goal' + (x.done ? " done" : "") + '"><input type="checkbox" id="' + esc(id) + '" data-goal="' + esc(x.id) + '" data-kind="extra"' + (x.done ? " checked" : "") + (S.readOnly ? " disabled" : "") + '><label for="' + esc(id) + '">' + esc(x.text) + '</label>' +
+      var id = "gx-" + gd + "-" + x.id, grp = groups[slotById(x.slot) ? x.slot : ""];
+      grp.t++; if (x.done) grp.n++;
+      grp.html += '<li class="goal' + (x.done ? " done" : "") + '"><input type="checkbox" id="' + esc(id) + '" data-goal="' + esc(x.id) + '" data-kind="extra"' + (x.done ? " checked" : "") + (S.readOnly ? " disabled" : "") + '><label for="' + esc(id) + '">' + esc(x.text) + '</label>' +
         (S.readOnly ? "" : '<button type="button" class="iconbtn" data-action="rm-extra" data-id="' + esc(x.id) + '" aria-label="Buang matlamat ' + esc(x.text) + '">×</button>') + '</li>';
     });
-    if (!gs.rec.length && !gs.extras.length) items += '<li class="empty">Tiada matlamat lagi. Tambah di bawah, atau tetapkan matlamat harian dalam Tetapan.</li>';
+    var nowSlot = isToday ? slotNow() : "";
+    if (groups[""].t) items += '<li class="slot-h"><span>🗓️ Sepanjang hari</span><small>' + groups[""].n + '/' + groups[""].t + '</small></li>' + groups[""].html;
+    SLOTS.forEach(function(s){
+      var grp = groups[s.id], now = s.id === nowSlot;
+      items += '<li class="slot-h' + (now ? " now" : "") + '"><span>' + s.icon + " " + s.name + (now ? "<em>sekarang</em>" : "") + '</span>' + (grp.t ? '<small>' + grp.n + '/' + grp.t + '</small>' : "") + '</li>';
+      items += grp.html || (S.readOnly ? "" : '<li class="slot-empty"><button type="button" class="link" data-action="slot-add" data-slot="' + s.id + '">+ Tambah untuk ' + s.name.toLowerCase() + '</button></li>');
+    });
 
     var keepVal = $("gNew") ? $("gNew").value : "";
+    var keepSlot = $("gSlot") ? $("gSlot").value : slotNow();
+    var keepRep = $("gRep") ? $("gRep").checked : false;
     var hadFocus = document.activeElement && document.activeElement.id === "gNew";
     el.innerHTML =
       '<div class="today-money">' +
@@ -1293,9 +1500,12 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
         '<div class="goal-head"><h3>Matlamat ' + (isToday ? "hari ini" : esc(dayLabel(gd))) + '</h3><span class="goal-score">' + gs.n + '/' + gs.total + ' siap</span></div>' +
         '<div class="strip">' + strip + '</div>' +
         '<ul class="goals">' + items + '</ul>' +
-        (S.readOnly ? "" : '<form class="addgoal" id="addGoalForm" novalidate><input id="gNew" type="text" maxlength="80" placeholder="Matlamat tambahan untuk ' + (isToday ? "hari ini" : esc(shortDate(gd))) + '" aria-label="Matlamat tambahan" autocomplete="off"><button type="submit" class="btn ghost small">Tambah</button></form>') +
+        (S.readOnly ? "" : '<form class="addgoal" id="addGoalForm" novalidate><select id="gSlot" aria-label="Waktu">' +
+          SLOTS.map(function(s){ return '<option value="' + s.id + '">' + s.icon + " " + s.name + '</option>'; }).join("") + '<option value="">🗓️ Sepanjang hari</option></select>' +
+          '<input id="gNew" type="text" maxlength="80" placeholder="Matlamat untuk ' + (isToday ? "hari ini" : esc(shortDate(gd))) + '" aria-label="Matlamat baru" autocomplete="off"><button type="submit" class="btn ghost small">Tambah</button>' +
+          '<label class="grep"><input type="checkbox" id="gRep"> Ulang setiap hari (simpan dalam matlamat harian)</label></form>') +
       '</div>';
-    if ($("gNew")) { $("gNew").value = keepVal; if (hadFocus) $("gNew").focus(); }
+    if ($("gNew")) { $("gNew").value = keepVal; $("gSlot").value = keepSlot; $("gRep").checked = keepRep; if (hadFocus) $("gNew").focus(); }
   }
 
   function renderSummary(){
@@ -1429,7 +1639,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
     Object.keys(gs.done).forEach(function(k){ if (gs.done[k]) done[k] = true; });
     var de = dietEaten(day), diet = {};
     Object.keys(de).forEach(function(k){ if (de[k]) diet[k] = true; });
-    return {done:done, extras:gs.extras.map(function(x){ return {id:x.id, text:x.text, done:!!x.done}; }), diet:diet, updatedAt:new Date().toISOString()};
+    return {done:done, extras:gs.extras.map(function(x){ return {id:x.id, text:x.text, slot:slotById(x.slot) ? x.slot : "", done:!!x.done}; }), diet:diet, updatedAt:new Date().toISOString()};
   }
 
   /* ---------- entry form ---------- */
@@ -1487,7 +1697,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
     draft = {budget:base.budget, cycleStartDay:base.cycleStartDay, balance:base.balance, clearBalance:false,
       categories:base.categories.map(function(c){ return {id:c.id, name:c.name, alloc:c.alloc}; }), dailyGoals:base.dailyGoals.slice()};
     $("sBudget").value = draft.budget || ""; $("sStartDay").value = draft.cycleStartDay || 1; $("sBalance").value = "";
-    $("sGoals").value = draft.dailyGoals.map(function(g){ return g.text; }).join("\n");
+    $("sGoals").value = draft.dailyGoals.map(goalLine).join("\n");
     renderBalInfo(); renderDraft(); setErr("");
     var d = $("settingsDlg"); if (typeof d.showModal === "function") d.showModal(); else d.setAttribute("open", "");
     if (focusBalance) $("sBalance").focus();
@@ -1534,10 +1744,11 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
       cats.push({id:c.id, name:name, alloc:Math.round(al*100)/100});
     }
     var old = draft.dailyGoals, used = {};
-    var goals = $("sGoals").value.split(/\r?\n/).map(function(s){ return s.trim(); }).filter(Boolean).slice(0, 12).map(function(text){
+    var goals = $("sGoals").value.split(/\r?\n/).map(function(s){ return s.trim(); }).filter(Boolean).slice(0, 24).map(function(line){
+      var p = parseGoalLine(line), text = p.text.slice(0, 80);
       var m = old.find(function(g){ return g.text === text && !used[g.id]; });
-      var id = m ? m.id : newId("g"); used[id] = true; return {id:id, text:text.slice(0, 80)};
-    });
+      var id = m ? m.id : newId("g"); used[id] = true; return {id:id, text:text, slot:p.slot};
+    }).filter(function(g){ return g.text; });
     var balance = draft.clearBalance ? null : draft.balance;
     var bv = $("sBalance").value.trim();
     if (bv !== "") { var bn = parseFloat(bv); if (!(bn >= 0)) { setErr("Baki sebenar mesti nombor ₹0 atau lebih."); return; } balance = {amount:Math.round(bn*100)/100, asOf:new Date().toISOString()}; }
@@ -1570,6 +1781,436 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
     catch (e) { if (e && e.code === "declined") return; if (e && e.code === "rate_limited") { toast("Tetingkap simpan sudah dibuka. Cuba lagi sebentar."); return; } toast("Muat turun tidak tersedia di sini."); }
   }
 
+  /* ---------- small dialog helpers ---------- */
+  function showDlg(id){ var d = $(id); if (typeof d.showModal === "function") { if (!d.open) d.showModal(); } else d.setAttribute("open", ""); }
+  function hideDlg(id){ var d = $(id); if (d.open) { if (d.close) d.close(); else d.removeAttribute("open"); } }
+  function radioVal(name){ var r = document.querySelector('input[name="' + name + '"]:checked'); return r ? r.value : ""; }
+  function setRadio(name, v){ document.querySelectorAll('input[name="' + name + '"]').forEach(function(r){ r.checked = r.value === String(v); }); }
+  function showErr(id, msg){ var p = $(id); p.textContent = msg || ""; p.hidden = !msg; }
+  function isDate(s){ return /^\d{4}-\d{2}-\d{2}$/.test(String(s || "")); }
+  function longDate(s){ var p = s.split("-").map(Number); return p[2] + " " + MON_SHORT[p[1]-1] + " " + p[0]; }
+  function untilTxt(day){ var n = daysBetween(todayStr(), day); return n === 0 ? "hari ini" : n === 1 ? "esok" : n === -1 ? "semalam" : n > 0 ? "dalam " + n + " hari" : (-n) + " hari lalu"; }
+
+  /* ---------- daily goals: time of day ---------- */
+  var SLOTS = [
+    {id:"pagi", name:"Pagi", icon:"🌅", from:5, to:12},
+    {id:"tengahari", name:"Tengah hari", icon:"☀️", from:12, to:15},
+    {id:"petang", name:"Petang", icon:"🌇", from:15, to:19},
+    {id:"malam", name:"Malam", icon:"🌙", from:19, to:29}
+  ];
+  function slotById(id){ for (var i = 0; i < SLOTS.length; i++) if (SLOTS[i].id === id) return SLOTS[i]; return null; }
+  function slotNow(){ var h = new Date().getHours(); if (h < 5) h += 24; for (var i = 0; i < SLOTS.length; i++) if (h >= SLOTS[i].from && h < SLOTS[i].to) return SLOTS[i].id; return "malam"; }
+  function parseGoalLine(line){
+    var m = /^(pagi|tengah\s*hari|tengahari|tgh\s*hari|petang|malam)\s*[:\-–]\s*(.+)$/i.exec(line);
+    if (!m) return {slot:"", text:line};
+    var k = m[1].toLowerCase().replace(/\s+/g, "");
+    return {slot: k === "pagi" || k === "petang" || k === "malam" ? k : "tengahari", text:m[2].trim()};
+  }
+  function goalLine(g){ var s = slotById(g.slot); return (s ? s.name + ": " : "") + g.text; }
+  function addRecurringGoal(text, slot){
+    if (!db || !S.settings || S.readOnly) return;
+    var s = S.settings, goals = s.dailyGoals.concat([{id:newId("g"), text:text.slice(0, 80), slot:slotById(slot) ? slot : ""}]);
+    var body = settingsBody({budget:s.budget, cycleStartDay:s.cycleStartDay, categories:s.categories, dailyGoals:goals, balance:s.balance});
+    withRetry(function(){ return db.doc("settings/main").set(body); })
+      .then(function(){ toast("Ditambah sebagai matlamat setiap hari"); })
+      .catch(function(e){ toast(writeErrMsg(e)); });
+  }
+
+  /* ---------- calendar ---------- */
+  var CAL_KINDS = {tugas:{icon:"✅", name:"Tugas"}, projek:{icon:"📌", name:"Projek"}, acara:{icon:"📅", name:"Acara"}};
+  var calEditing = null, calDelArm = false;
+  function isProj(a){ return a.kind === "projek" && isDate(a.end); }
+  function agKey(a){ return isProj(a) ? a.end : a.date; }
+  function agendaOn(day){
+    return S.agenda.filter(function(a){ return isProj(a) ? (a.date <= day && day <= a.end) : a.date === day; })
+      .sort(function(x, y){ var a = x.time || "99:99", b = y.time || "99:99"; return a < b ? -1 : a > b ? 1 : String(x.createdAt).localeCompare(String(y.createdAt)); });
+  }
+  function agItem(a, withDate){
+    var k = CAL_KINDS[a.kind] || CAL_KINDS.tugas, t = todayStr(), sub = [];
+    if (isProj(a)) {
+      var tot = daysBetween(a.date, a.end) + 1, n = Math.min(Math.max(daysBetween(a.date, t) + 1, 0), tot);
+      sub.push(shortDate(a.date) + " – " + shortDate(a.end) + (n > 0 ? " · hari " + n + "/" + tot : ""));
+      sub.push("deadline " + untilTxt(a.end));
+    } else if (withDate) { sub.push(dayLabel(a.date)); sub.push(untilTxt(a.date)); }
+    if (a.time) sub.push(a.time);
+    var late = !a.done && a.kind !== "acara" && agKey(a) < t;
+    var lead = a.kind === "acara" ? '<span class="agicon" aria-hidden="true">' + k.icon + '</span>'
+      : '<input type="checkbox" data-cal-done="' + esc(a.id) + '"' + (a.done ? " checked" : "") + (S.readOnly ? " disabled" : "") + ' aria-label="Tanda siap: ' + esc(a.title) + '">';
+    return '<li class="ag k-' + a.kind + (a.done ? " done" : "") + (late ? " late" : "") + '">' + lead +
+      '<div class="ag-b"><span class="ag-t">' + (a.kind === "acara" ? "" : k.icon + " ") + esc(a.title) + '</span>' + (sub.length ? '<small>' + esc(sub.join(" · ")) + '</small>' : "") +
+      (a.note ? '<small>' + esc(a.note) + '</small>' : "") + '</div>' +
+      (S.readOnly ? "" : '<button type="button" class="link" data-action="cal-edit" data-id="' + esc(a.id) + '">Ubah</button>') + '</li>';
+  }
+  function renderAgenda(){
+    var el = $("agenda"); if (!el) return;
+    if (S.noDb) { el.hidden = true; return; }
+    el.hidden = false;
+    var t = todayStr();
+    if (!S.cal.month) S.cal.month = t.slice(0, 7);
+    if (!S.cal.sel) S.cal.sel = t;
+    var mk = S.cal.month, p = mk.split("-").map(Number), first = new Date(p[0], p[1]-1, 1), nd = new Date(p[0], p[1], 0).getDate();
+    var cells = DAYS_SHORT.map(function(d){ return '<span class="cal-h">' + d + '</span>'; }).join("");
+    for (var i = 0; i < first.getDay(); i++) cells += '<span></span>';
+    for (var d = 1; d <= nd; d++) {
+      var ds = mk + "-" + pad(d), on = agendaOn(ds), dots = "";
+      var proj = on.some(function(a){ return isProj(a) && !a.done; });
+      on.filter(function(a){ return !isProj(a); }).slice(0, 3).forEach(function(a){ dots += '<i class="k-' + a.kind + (a.done ? " done" : "") + '"></i>'; });
+      if (on.some(function(a){ return isProj(a) && a.end === ds && !a.done; })) dots += '<i class="k-due"></i>';
+      cells += '<button type="button" class="cal-d' + (ds === t ? " today" : "") + (ds === S.cal.sel ? " sel" : "") + (proj ? " proj" : "") + '" data-action="cal-day" data-day="' + ds + '"' +
+        ' aria-label="' + esc(dayLabel(ds) + (on.length ? ", " + on.length + " perkara" : "")) + '" aria-pressed="' + (ds === S.cal.sel) + '"><b>' + d + '</b><span class="cal-dots">' + dots + '</span></button>';
+    }
+    var sel = S.cal.sel, list = agendaOn(sel);
+    var over = S.agenda.filter(function(a){ return !a.done && a.kind !== "acara" && agKey(a) < t; }).sort(function(a, b){ return agKey(a) < agKey(b) ? -1 : 1; });
+    var horizon = addDays(t, 30);
+    var up = S.agenda.filter(function(a){ var k = agKey(a); return !a.done && k >= t && k <= horizon && list.indexOf(a) < 0; })
+      .sort(function(a, b){ return agKey(a) < agKey(b) ? -1 : agKey(a) > agKey(b) ? 1 : 0; }).slice(0, 8);
+    el.innerHTML =
+      '<div class="panel-head"><h2>Kalendar</h2>' + (S.readOnly ? "" : '<button type="button" class="btn primary small" data-action="cal-add">+ Tambah</button>') + '</div>' +
+      '<div class="calnav"><button type="button" class="iconbtn" data-action="cal-prev" aria-label="Bulan sebelum">‹</button><b>' + MONTHS[p[1]-1] + " " + p[0] + '</b>' +
+        '<button type="button" class="iconbtn" data-action="cal-next" aria-label="Bulan seterusnya">›</button>' +
+        (mk !== t.slice(0, 7) || sel !== t ? '<button type="button" class="link" data-action="cal-today">Hari ini</button>' : "") + '</div>' +
+      '<div class="calgrid">' + cells + '</div>' +
+      '<p class="cal-legend"><span><i></i>Tugas</span><span><i class="k-acara"></i>Acara</span><span><i class="k-proj"></i>Projek berjalan</span><span><i class="k-due"></i>Deadline projek</span></p>' +
+      '<div class="agsec"><h3>' + esc(sel === t ? "Hari ini · " + dayLabel(sel) : dayLabel(sel)) + '</h3>' +
+        (list.length ? '<ul class="agl">' + list.map(function(a){ return agItem(a, false); }).join("") + '</ul>' : '<p class="hint" style="margin:0">Tiada apa-apa pada hari ini.' + (S.readOnly ? "" : ' Tekan "+ Tambah" untuk masukkan tugas, projek atau acara.') + '</p>') + '</div>' +
+      (over.length ? '<div class="agsec"><h3 class="late-h">Terlewat</h3><ul class="agl">' + over.map(function(a){ return agItem(a, true); }).join("") + '</ul></div>' : "") +
+      '<div class="agsec"><h3>Akan datang · 30 hari</h3>' +
+        (up.length ? '<ul class="agl">' + up.map(function(a){ return agItem(a, true); }).join("") + '</ul>' : '<p class="hint" style="margin:0">Tiada tarikh penting dalam 30 hari akan datang.</p>') + '</div>';
+  }
+  function calKindUi(){
+    var k = radioVal("calKind");
+    $("calEndWrap").hidden = k !== "projek";
+    $("calDateLbl").textContent = k === "projek" ? "Mula" : "Tarikh";
+  }
+  function openCal(id){
+    if (S.readOnly || !db) return;
+    var a = id ? S.agenda.find(function(x){ return x.id === id; }) : null;
+    calEditing = a ? a.id : null; calDelArm = false;
+    $("calDlgTitle").textContent = a ? "Ubah dalam kalendar" : "Tambah ke kalendar";
+    setRadio("calKind", a ? a.kind : "tugas");
+    $("calTitle").value = a ? a.title : "";
+    $("calDate").value = a ? a.date : (S.cal.sel || todayStr());
+    $("calTime").value = a ? a.time : "";
+    $("calEnd").value = a ? a.end : "";
+    $("calNote").value = a ? a.note : "";
+    $("calDelete").hidden = !a; $("calDelete").textContent = "Padam";
+    showErr("calErr", ""); calKindUi(); showDlg("calDlg"); $("calTitle").focus();
+  }
+  function agendaBody(a){ return {kind:a.kind, title:a.title, date:a.date, end:a.end || "", time:a.time || "", note:a.note || "", done:!!a.done, createdAt:a.createdAt || new Date().toISOString(), updatedAt:new Date().toISOString()}; }
+  async function saveCal(ev){
+    ev.preventDefault();
+    if (!db || S.readOnly) return;
+    var kind = radioVal("calKind") || "tugas", title = $("calTitle").value.trim(), date = $("calDate").value, time = $("calTime").value;
+    var end = kind === "projek" ? $("calEnd").value : "", note = $("calNote").value.trim();
+    if (!title) { showErr("calErr", "Tulis apa perkara ini."); $("calTitle").focus(); return; }
+    if (!isDate(date)) { showErr("calErr", "Pilih tarikh."); return; }
+    if (kind === "projek" && !isDate(end)) { showErr("calErr", "Projek perlukan tarikh akhir (deadline)."); $("calEnd").focus(); return; }
+    if (end && end < date) { showErr("calErr", "Deadline mesti sama atau selepas tarikh mula."); return; }
+    var prev = calEditing ? S.agenda.find(function(x){ return x.id === calEditing; }) : null;
+    var body = agendaBody({kind:kind, title:title.slice(0, 100), date:date, end:end, time:/^\d\d:\d\d$/.test(time) ? time : "", note:note.slice(0, 500), done:prev ? prev.done : false, createdAt:prev ? prev.createdAt : null});
+    try {
+      await withRetry(function(){ return db.doc("agenda/" + (calEditing || newId("a"))).set(body); });
+      hideDlg("calDlg"); S.cal.sel = date; S.cal.month = date.slice(0, 7); render();
+      toast(prev ? "Kalendar dikemas kini" : "Ditambah ke kalendar: " + shortDate(date));
+    } catch (e) { showErr("calErr", writeErrMsg(e)); }
+  }
+  async function deleteCal(){
+    if (!calEditing || !db) return;
+    if (!calDelArm) { calDelArm = true; $("calDelete").textContent = "Pasti padam?"; return; }
+    try { await withRetry(function(){ return db.doc("agenda/" + calEditing).delete(); }); hideDlg("calDlg"); toast("Dipadam dari kalendar"); }
+    catch (e) { showErr("calErr", writeErrMsg(e)); }
+  }
+  function setAgendaDone(id, done){
+    var a = S.agenda.find(function(x){ return x.id === id; }); if (!a || !db || S.readOnly) return;
+    a.done = done; var body = agendaBody(a); renderAgenda();
+    withRetry(function(){ return db.doc("agenda/" + id).set(body); }).then(function(){ if (done) toast("Siap! 👏"); }).catch(function(e){ toast(writeErrMsg(e)); });
+  }
+
+  /* ---------- long-term goals: 3 years → 1 year → 90 days ---------- */
+  var LEVELS = {"3y":"3 tahun", "1y":"1 tahun", "90d":"90 hari"};
+  var gDraft = null, gDelArm = false;
+  function addYears(s, n){ var d = toDate(s), m = d.getMonth(); d.setFullYear(d.getFullYear() + n); if (d.getMonth() !== m) d.setDate(0); return ymd(d); }
+  function letter(i){ return i >= 0 && i < 26 ? String.fromCharCode(65 + i) : String(i + 1); }
+  function byCreated(a, b){ return String(a.createdAt).localeCompare(String(b.createdAt)); }
+  function planById(id){ for (var i = 0; i < S.plan.length; i++) if (S.plan[i].id === id) return S.plan[i]; return null; }
+  function kids(parent, filt){ return S.plan.filter(function(g){ return g.parent === parent && (!filt || filt(g)); }).sort(byCreated); }
+  function roots(){ return S.plan.filter(function(g){ return g.level === "3y" && isDate(g.start); }).sort(byCreated); }
+  function rootOf(g){ var n = 0; while (g && g.level !== "3y" && n++ < 4) g = planById(g.parent); return g && g.level === "3y" && isDate(g.start) ? g : null; }
+  function yearRange(root, y){ return {a:addYears(root.start, y), b:addDays(addYears(root.start, y + 1), -1)}; }
+  function qRange(root, y, q){ var yr = yearRange(root, y); return {a:addDays(yr.a, 90 * q), b:q < 3 ? addDays(yr.a, 90 * (q + 1) - 1) : yr.b}; }
+  function rangeOf(g){
+    var r = rootOf(g); if (!r) return null;
+    if (g.level === "3y") return {a:r.start, b:addDays(addYears(r.start, 3), -1)};
+    if (g.level === "1y") return yearRange(r, g.year);
+    var one = planById(g.parent); return one ? qRange(r, one.year, g.q) : null;
+  }
+  function curYear(root, day){ var y = 0; for (var i = 1; i < 3; i++) if (day >= yearRange(root, i).a) y = i; return y; }
+  function curQ(root, y, day){ var q = 0; for (var i = 1; i < 4; i++) if (day >= qRange(root, y, i).a) q = i; return q; }
+  function inRange(r, day){ return r && day >= r.a && day <= r.b; }
+  function logsOf(id){ return S.glog.filter(function(l){ return l.goal === id; }); }
+  function timeFrac(r){ var tot = daysBetween(r.a, r.b) + 1; return Math.min(Math.max((daysBetween(r.a, todayStr()) + 1) / tot, 0), 1); }
+  function avg(arr){ return arr.length ? arr.reduce(function(t, x){ return t + x; }, 0) / arr.length : 0; }
+  // 90 days: every day you write adds (success ÷ 5) of a day. Writing all 90 days at 5/5 = 100%.
+  // 1 year = average of its four 90-day rounds; 3 years = average of its three years. Empty rounds count as 0.
+  function progress(g){
+    if (g.done) return 1;
+    if (g.level === "90d") {
+      var r = rangeOf(g); if (!r) return 0;
+      var pts = 0;
+      logsOf(g.id).forEach(function(l){ if (inRange(r, l.date)) pts += (Number(l.rating) || 3) / 5; });
+      return Math.min(pts / (daysBetween(r.a, r.b) + 1), 1);
+    }
+    var parts = [], i, c;
+    if (g.level === "1y") for (i = 0; i < 4; i++) { c = kids(g.id, function(x){ return x.q === i; }); parts.push(c.length ? avg(c.map(progress)) : 0); }
+    else for (i = 0; i < 3; i++) { c = kids(g.id, function(x){ return x.year === i; }); parts.push(c.length ? avg(c.map(progress)) : 0); }
+    return avg(parts);
+  }
+  function activeNineties(day){
+    return S.plan.filter(function(g){ return g.level === "90d" && !g.done && inRange(rangeOf(g), day); }).sort(byCreated);
+  }
+  function pbar(p, pace, label){
+    return '<div class="pbar"><div class="meter thin" role="img" aria-label="' + esc(label + ": " + Math.round(p * 100) + "% kemajuan, " + Math.round(pace * 100) + "% masa sudah berlalu") + '">' +
+      '<div class="meter-fill' + (p >= 1 ? " full" : "") + '" style="width:' + (p * 100).toFixed(1) + '%"></div><div class="meter-pace" style="left:' + (pace * 100).toFixed(1) + '%"></div></div><b>' + Math.round(p * 100) + '%</b></div>';
+  }
+  function editBtn(g){ return S.readOnly ? "" : '<button type="button" class="link" data-action="g-edit" data-id="' + esc(g.id) + '">Ubah</button>'; }
+  function streakOf(g){
+    var days = {}; logsOf(g.id).forEach(function(l){ days[l.date] = true; });
+    var d = todayStr(), n = 0; if (!days[d]) d = addDays(d, -1);
+    while (days[d]) { n++; d = addDays(d, -1); }
+    return n;
+  }
+
+  function renderPlan(){
+    var el = $("plan"); if (!el) return;
+    var lp = $("glogPanel"), logsEl = $("planLogs"), t = todayStr();
+    lp.hidden = true; logsEl.innerHTML = "";
+    if (S.noDb) { el.innerHTML = ""; return; }
+    var rs3 = roots();
+    if (!rs3.length) {
+      el.innerHTML = '<section class="panel gintro"><span class="eyebrow">Goal</span><h2>3 tahun → 1 tahun → 90 hari</h2>' +
+        '<p>Mula dengan satu goal besar untuk 3 tahun. App kira sendiri bila 3 tahun tamat, bila setiap tahun tamat, dan bila setiap pusingan 90 hari tamat.</p>' +
+        '<p>Kemudian pecahkan kepada goal 1 tahun (Goal A, Goal B…) dan goal 90 hari. Dalam goal 90 hari, tulis setiap hari apa yang anda <b>belajar</b> dan apa yang anda <b>cuba</b>, dan nilai sejauh mana anda berjaya. Bar kemajuan naik ikut catatan anda.</p>' +
+        (S.readOnly ? "" : '<div><button type="button" class="btn primary" data-action="g-new" data-level="3y">+ Goal 3 tahun pertama</button></div>') + '</section>';
+      return;
+    }
+    if (!planById(S.pv.root) || planById(S.pv.root).level !== "3y") { S.pv.root = rs3[0].id; S.pv.year = null; S.pv.q = null; }
+    var root = planById(S.pv.root), ri = rs3.indexOf(root);
+    var tabs = '<div class="subtabs" role="tablist" aria-label="Goal 3 tahun">' + rs3.map(function(r, i){
+      return '<button type="button" role="tab" class="subtab" aria-selected="' + (r.id === root.id) + '" data-action="g-root" data-id="' + esc(r.id) + '"><b>Goal ' + letter(i) + '</b><span>' + esc(r.title) + '</span></button>';
+    }).join("") + (S.readOnly ? "" : '<button type="button" class="subtab add" data-action="g-new" data-level="3y">+ Goal 3 tahun</button>') + '</div>';
+
+    var open = S.pv.open ? planById(S.pv.open) : null;
+    if (open && open.level === "90d" && rootOf(open) === root && planById(open.parent)) {
+      el.innerHTML = tabs + detailHtml(open, root, ri);
+      var r = rangeOf(open);
+      lp.hidden = S.readOnly || t < r.a;
+      logsEl.innerHTML = logsHtml(open);
+      return;
+    }
+    S.pv.open = null;
+
+    var rr = rangeOf(root), left = daysBetween(t, rr.b);
+    if (S.pv.year == null) S.pv.year = t < root.start ? 0 : curYear(root, t);
+    var y = S.pv.year, yr = yearRange(root, y);
+    if (S.pv.q == null) S.pv.q = inRange(yr, t) ? curQ(root, y, t) : 0;
+    var q = S.pv.q, qr = qRange(root, y, q);
+
+    var head = '<section class="panel groot">' +
+      '<div class="g-top"><span class="eyebrow">Goal ' + letter(ri) + ' · 3 tahun' + (root.done ? " · tercapai ✓" : "") + '</span>' + editBtn(root) + '</div>' +
+      '<h2 class="g-title">' + esc(root.title) + '</h2>' + (root.why ? '<p class="g-why">' + esc(root.why) + '</p>' : "") +
+      '<p class="g-dates">' + longDate(rr.a) + ' → ' + longDate(rr.b) + ' · ' + (t < rr.a ? "mula " + untilTxt(rr.a) : left >= 0 ? nf0.format(left) + " hari lagi" : "tempoh tamat") + '</p>' +
+      pbar(progress(root), timeFrac(rr), "Goal 3 tahun") +
+      '<p class="hint" style="margin:0">Bar = kemajuan anda. Garis hitam = masa yang sudah berlalu. Cuba kekal di depan garis.</p>' +
+      '<div class="gyears" role="group" aria-label="Pilih tahun">' + [0, 1, 2].map(function(i){
+        var r = yearRange(root, i), now = inRange(r, t);
+        return '<button type="button" class="gchip' + (i === y ? " sel" : "") + '" data-action="g-year" data-y="' + i + '" aria-pressed="' + (i === y) + '"><b>Tahun ' + (i + 1) + (now ? "<em>sekarang</em>" : "") + '</b><small>' + longDate(r.a) + ' – ' + longDate(r.b) + '</small></button>';
+      }).join("") + '</div></section>';
+
+    var ones = kids(root.id, function(g){ return g.level === "1y" && g.year === y; });
+    var qchips = '<div class="gqs" role="group" aria-label="Pilih pusingan 90 hari">' + [0, 1, 2, 3].map(function(i){
+      var r = qRange(root, y, i), now = inRange(r, t);
+      return '<button type="button" class="gchip' + (i === q ? " sel" : "") + '" data-action="g-q" data-q="' + i + '" aria-pressed="' + (i === q) + '"><b>90 hari ' + (i + 1) + (now ? "<em>sekarang</em>" : "") + '</b><small>' + shortDate(r.a) + ' – ' + shortDate(r.b) + '</small></button>';
+    }).join("") + '</div>';
+    var yearSec = '<section class="panel gyear"><div class="panel-head"><h2>Goal 1 tahun · Tahun ' + (y + 1) + '</h2>' +
+      (S.readOnly ? "" : '<button type="button" class="btn primary small" data-action="g-new" data-level="1y" data-parent="' + esc(root.id) + '" data-y="' + y + '">+ Goal 1 tahun</button>') + '</div>' +
+      '<p class="g-dates">' + longDate(yr.a) + ' → ' + longDate(yr.b) + '</p>' +
+      (ones.length ? qchips + ones.map(function(g, i){ return oneCard(g, i, q, qr, t); }).join("")
+        : '<div class="empty">Belum ada goal untuk Tahun ' + (y + 1) + '. Apa yang mesti berlaku dalam setahun ini supaya "' + esc(root.title) + '" tercapai?</div>') + '</section>';
+    el.innerHTML = tabs + head + yearSec;
+  }
+  function oneCard(g, i, q, qr, t){
+    var nine = kids(g.id, function(x){ return x.q === q; });
+    return '<div class="gone"><div class="g-row"><span class="gbadge">' + letter(i) + '</span><div class="g-main"><b>' + esc(g.title) + (g.done ? " ✓" : "") + '</b>' + (g.why ? '<small>' + esc(g.why) + '</small>' : "") + '</div>' + editBtn(g) + '</div>' +
+      pbar(progress(g), timeFrac(rangeOf(g)), "Goal 1 tahun " + letter(i)) +
+      '<div class="g90h"><span>90 hari ' + (q + 1) + ' · ' + shortDate(qr.a) + ' – ' + shortDate(qr.b) + '</span>' +
+        (S.readOnly ? "" : '<button type="button" class="link" data-action="g-new" data-level="90d" data-parent="' + esc(g.id) + '" data-q="' + q + '">+ Goal 90 hari</button>') + '</div>' +
+      (nine.length ? '<ul class="g90l">' + nine.map(function(n, j){
+        var r = rangeOf(n), wrote = S.glog.some(function(l){ return l.goal === n.id && l.date === t; }), p = progress(n);
+        var st = n.done ? "Tercapai ✓" : t < r.a ? "Mula " + untilTxt(r.a) : t > r.b ? "Pusingan tamat" : (wrote ? "✍️ Dah tulis hari ini" : "✍️ Belum tulis hari ini");
+        return '<li><button type="button" class="g90" data-action="g-open" data-id="' + esc(n.id) + '"><span class="gbadge sm">' + letter(j) + '</span><span class="g-main"><b>' + esc(n.title) + '</b><small>' + esc(st + " · " + logsOf(n.id).length + " catatan") + '</small>' +
+          '<span class="meter thin"><span class="meter-fill' + (p >= 1 ? " full" : "") + '" style="width:' + (p * 100).toFixed(1) + '%"></span></span></span><b class="g-pct">' + Math.round(p * 100) + '%</b><span aria-hidden="true">›</span></button></li>';
+      }).join("") + '</ul>' : '<p class="hint" style="margin:0">Tiada goal 90 hari lagi untuk pusingan ini.</p>') + '</div>';
+  }
+  function detailHtml(g, root, ri){
+    var t = todayStr(), r = rangeOf(g), one = planById(g.parent);
+    var oi = kids(root.id, function(x){ return x.level === "1y" && x.year === one.year; }).indexOf(one);
+    var ni = kids(one.id, function(x){ return x.q === g.q; }).indexOf(g);
+    var D = daysBetween(r.a, r.b) + 1, el = Math.min(Math.max(daysBetween(r.a, t) + 1, 0), D);
+    var logs = logsOf(g.id).filter(function(l){ return inRange(r, l.date); });
+    var rated = logs.map(function(l){ return Number(l.rating) || 0; }).filter(Boolean);
+    var when = t < r.a ? "mula " + untilTxt(r.a) : t > r.b ? "pusingan tamat" : "hari " + el + " daripada " + D + " · " + (D - el) + " hari lagi";
+    return '<section class="panel gdet">' +
+      '<button type="button" class="link back" data-action="g-back">‹ Kembali ke Goal ' + letter(ri) + '</button>' +
+      '<span class="eyebrow">Goal ' + letter(ri) + ' › Tahun ' + (one.year + 1) + ' goal ' + letter(oi) + ' › 90 hari ' + (g.q + 1) + ' goal ' + letter(ni) + (g.done ? " · tercapai ✓" : "") + '</span>' +
+      '<div class="g-top"><h2 class="g-title">' + esc(g.title) + '</h2>' + editBtn(g) + '</div>' +
+      (g.why ? '<p class="g-why">' + esc(g.why) + '</p>' : "") +
+      '<p class="g-ctx">Untuk goal 1 tahun: <b>' + esc(one.title) + '</b><br>Untuk goal 3 tahun: <b>' + esc(root.title) + '</b></p>' +
+      '<p class="g-dates">' + longDate(r.a) + ' → ' + longDate(r.b) + ' · ' + when + '</p>' +
+      pbar(progress(g), timeFrac(r), "Goal 90 hari") +
+      '<dl class="gstats"><div><dt>Hari ditulis</dt><dd>' + logs.length + '<small> / ' + el + '</small></dd></div>' +
+        '<div><dt>Purata berjaya</dt><dd>' + (rated.length ? fmt1(avg(rated)) : "–") + '<small> / 5</small></dd></div>' +
+        '<div><dt>Berturut-turut</dt><dd>' + streakOf(g) + '<small> hari</small></dd></div></dl>' +
+      '<p class="hint" style="margin:0">Kemajuan naik setiap hari anda tulis. Hari yang lebih berjaya beri lebih banyak: 5/5 = satu hari penuh, 3/5 = separuh lebih. Tulis setiap hari dengan 5/5 selama ' + D + ' hari = 100%.</p>' +
+      (S.readOnly ? "" : '<div><button type="button" class="btn ghost small" data-action="g-done" data-id="' + esc(g.id) + '">' + (g.done ? "Batal tanda tercapai" : "✓ Tandakan goal ini tercapai") + '</button></div>') +
+      '</section>';
+  }
+  function logsHtml(g){
+    var list = logsOf(g.id).sort(function(a, b){ return a.date < b.date ? 1 : -1; });
+    var faces = ["", "😣", "😕", "😐", "🙂", "🔥"];
+    return '<section class="panel"><div class="panel-head"><h2>Catatan Belajar &amp; Cuba</h2><span class="meta">' + list.length + ' catatan</span></div>' +
+      (list.length ? '<ul class="glogs">' + list.map(function(l){
+        var acts = S.readOnly ? "" : S.pv.delLog === l.id
+          ? '<span class="confirm">Padam?</span><button type="button" class="link danger" data-action="gl-del-yes" data-id="' + esc(l.id) + '">Ya</button><button type="button" class="link" data-action="gl-del-no">Batal</button>'
+          : '<button type="button" class="link" data-action="gl-edit" data-date="' + l.date + '">Ubah</button><button type="button" class="link danger" data-action="gl-del" data-id="' + esc(l.id) + '">Padam</button>';
+        return '<li class="glog"><div class="gl-h"><b>' + esc(dayLabel(l.date)) + '</b>' + (l.rating ? '<span class="gl-r">' + faces[l.rating] + " " + l.rating + '/5</span>' : "") + acts + '</div>' +
+          (l.learn ? '<p><span>📚 Belajar</span>' + esc(l.learn) + '</p>' : "") + (l.tried ? '<p><span>🧪 Cuba</span>' + esc(l.tried) + '</p>' : "") + '</li>';
+      }).join("") + '</ul>' : '<div class="empty">Belum ada catatan. Tulis yang pertama di atas, walaupun satu ayat.</div>') + '</section>';
+  }
+  function fillLog(g, date){
+    var r = rangeOf(g), t = todayStr(); if (!r) return;
+    var max = r.b < t ? r.b : t;
+    if (!isDate(date) || date < r.a || date > max) date = inRange(r, t) ? t : max;
+    $("glDate").min = r.a; $("glDate").max = max; $("glDate").value = date;
+    var l = S.glog.find(function(x){ return x.goal === g.id && x.date === date; });
+    $("glLearn").value = l ? l.learn : ""; $("glTry").value = l ? l.tried : ""; setRadio("glRate", l && l.rating ? l.rating : "");
+    $("glogHead").textContent = date === t ? "Belajar & Cuba hari ini" : "Belajar & Cuba · " + dayLabel(date);
+    $("glSave").textContent = l ? "Simpan perubahan" : "Simpan catatan";
+    showErr("glErr", "");
+  }
+  function openGoal(id, date){
+    var g = planById(id); if (!g) return;
+    var r = rootOf(g); if (r && S.pv.root !== r.id) { S.pv.root = r.id; S.pv.year = null; S.pv.q = null; }
+    var one = planById(g.parent); if (one) { S.pv.year = one.year; S.pv.q = g.q; }
+    S.pv.open = id; S.pv.delLog = null;
+    if (document.body.dataset.tab !== "goal") goTab("goal"); else window.scrollTo(0, 0);
+    render(); fillLog(g, date);
+  }
+  async function saveLog(ev){
+    ev.preventDefault();
+    var g = planById(S.pv.open); if (!g || !db || S.readOnly) return;
+    var r = rangeOf(g), date = $("glDate").value, learn = $("glLearn").value.trim(), tried = $("glTry").value.trim(), rate = Number(radioVal("glRate")) || 0;
+    if (!learn && !tried) { showErr("glErr", "Tulis sekurang-kurangnya satu: apa yang dipelajari, atau apa yang dicuba."); $("glLearn").focus(); return; }
+    if (!(rate >= 1 && rate <= 5)) { showErr("glErr", "Pilih sejauh mana anda berjaya hari ini (1 hingga 5)."); return; }
+    if (!isDate(date) || !inRange(r, date) || date > todayStr()) { showErr("glErr", "Tarikh mesti dalam pusingan 90 hari ini, dan bukan hari depan."); return; }
+    showErr("glErr", "");
+    var id = g.id + "_" + date, prev = S.glog.find(function(x){ return x.id === id; }), now = new Date().toISOString();
+    var body = {goal:g.id, date:date, learn:learn.slice(0, 4000), tried:tried.slice(0, 4000), rating:rate, createdAt:prev ? prev.createdAt : now, updatedAt:now};
+    $("glSave").disabled = true;
+    try {
+      await withRetry(function(){ return db.doc("glog/" + id).set(body); });
+      $("glSave").textContent = "Simpan perubahan";
+      toast(prev ? "Catatan dikemas kini" : "Catatan disimpan. Teruskan! 💪");
+    } catch (e) { showErr("glErr", writeErrMsg(e)); }
+    finally { $("glSave").disabled = false; }
+  }
+
+  function openGoalDlg(o){
+    if (S.readOnly || !db) return;
+    var g = o.id ? planById(o.id) : null;
+    gDraft = g ? {id:g.id, level:g.level, parent:g.parent, year:g.year, q:g.q} : {id:null, level:o.level, parent:o.parent || "", year:Number(o.year) || 0, q:Number(o.q) || 0};
+    gDelArm = false;
+    var lv = gDraft.level, ctx = "";
+    $("goalDlgTitle").textContent = g ? "Ubah goal " + LEVELS[lv] : "Goal " + LEVELS[lv] + " baru";
+    $("goTitle").value = g ? g.title : ""; $("goWhy").value = g ? g.why : "";
+    $("goTitle").placeholder = lv === "3y" ? "cth. Tamat MBBS dan lulus exam dengan baik" : lv === "1y" ? "cth. Lulus semua exam tahun ini pada cubaan pertama" : "cth. Habis ulang kaji Patologi sistemik + 300 MCQ";
+    $("goWhyLbl").innerHTML = (lv === "3y" ? "Kenapa goal ini penting bagi saya?" : lv === "1y" ? "Apa hasil yang saya mahu dalam setahun?" : "Bagaimana saya tahu saya berjaya?") + ' <span class="opt">(pilihan)</span>';
+    $("goStartWrap").hidden = lv !== "3y";
+    $("goStart").value = g && lv === "3y" ? g.start : todayStr();
+    if (lv === "1y") { var rt = planById(gDraft.parent); ctx = rt ? "Di bawah goal 3 tahun: " + rt.title + " · Tahun " + (gDraft.year + 1) : ""; }
+    if (lv === "90d") { var one = planById(gDraft.parent); ctx = one ? "Di bawah goal 1 tahun: " + one.title : ""; }
+    $("goCtx").textContent = ctx; $("goCtx").hidden = !ctx;
+    $("goDelete").hidden = !g; $("goDelete").textContent = "Padam";
+    showErr("goErr", ""); goalDates(); showDlg("goalDlg"); $("goTitle").focus();
+  }
+  function goalDates(){
+    if (!gDraft) return;
+    var lv = gDraft.level, html = "";
+    if (lv === "3y") {
+      var s = $("goStart").value; if (!isDate(s)) { $("goDates").innerHTML = ""; return; }
+      var fake = {start:s}, q1 = qRange(fake, 0, 0);
+      html = '<li class="big"><span>🎯 Sasaran 3 tahun</span><b>' + longDate(addDays(addYears(s, 3), -1)) + '</b></li>' +
+        [0, 1, 2].map(function(i){ var r = yearRange(fake, i); return '<li><span>Tahun ' + (i + 1) + '</span><b>' + longDate(r.a) + ' – ' + longDate(r.b) + '</b></li>'; }).join("") +
+        '<li><span>⏱ 90 hari pertama</span><b>' + longDate(q1.a) + ' – ' + longDate(q1.b) + '</b></li>';
+    } else if (lv === "1y") {
+      var root = planById(gDraft.parent); if (!root) return;
+      var yr = yearRange(root, gDraft.year);
+      html = '<li class="big"><span>🎯 Tahun ' + (gDraft.year + 1) + '</span><b>' + longDate(yr.a) + ' – ' + longDate(yr.b) + '</b></li>' +
+        [0, 1, 2, 3].map(function(i){ var r = qRange(root, gDraft.year, i); return '<li><span>90 hari ' + (i + 1) + '</span><b>' + longDate(r.a) + ' – ' + longDate(r.b) + '</b></li>'; }).join("");
+    } else {
+      var one = planById(gDraft.parent), rt = one && rootOf(one); if (!rt) return;
+      var r9 = qRange(rt, one.year, gDraft.q);
+      html = '<li class="big"><span>🎯 Pusingan 90 hari ' + (gDraft.q + 1) + '</span><b>' + longDate(r9.a) + ' – ' + longDate(r9.b) + '</b></li>' +
+        '<li><span>Tempoh</span><b>' + (daysBetween(r9.a, r9.b) + 1) + ' hari · tulis Belajar &amp; Cuba setiap hari</b></li>';
+    }
+    $("goDates").innerHTML = '<p class="hint" style="margin:0 0 6px">Tarikh dikira automatik:</p><ul class="godates">' + html + '</ul>';
+  }
+  function planBody(g){
+    var b = {level:g.level, parent:g.parent || "", title:g.title, why:g.why || "", done:!!g.done, createdAt:g.createdAt || new Date().toISOString(), updatedAt:new Date().toISOString()};
+    if (g.level === "3y") b.start = g.start; if (g.level === "1y") b.year = g.year; if (g.level === "90d") b.q = g.q;
+    return b;
+  }
+  async function saveGoal(ev){
+    ev.preventDefault();
+    if (!gDraft || !db || S.readOnly) return;
+    var lv = gDraft.level, title = $("goTitle").value.trim(), why = $("goWhy").value.trim(), start = $("goStart").value;
+    if (!title) { showErr("goErr", "Tulis goal anda."); $("goTitle").focus(); return; }
+    if (lv === "3y" && !isDate(start)) { showErr("goErr", "Pilih tarikh mula."); return; }
+    var prev = gDraft.id ? planById(gDraft.id) : null, isNew = !prev;
+    var id = gDraft.id || newId(lv === "3y" ? "p" : lv === "1y" ? "y" : "n");
+    var body = planBody({level:lv, parent:lv === "3y" ? "" : gDraft.parent, title:title.slice(0, 120), why:why.slice(0, 600), done:prev ? prev.done : false,
+      createdAt:prev ? prev.createdAt : null, start:start, year:gDraft.year, q:gDraft.q});
+    try {
+      await withRetry(function(){ return db.doc("plan/" + id).set(body); });
+      hideDlg("goalDlg");
+      if (isNew && lv === "3y") { S.pv.root = id; S.pv.year = null; S.pv.q = null; S.pv.open = null; }
+      render();
+      toast(!isNew ? "Goal dikemas kini" : lv === "3y" ? "Goal 3 tahun dicipta. Tarikh setiap tahun dan 90 hari dah dikira." : lv === "1y" ? "Goal 1 tahun ditambah" : "Goal 90 hari ditambah. Mula tulis Belajar & Cuba hari ini!");
+      if (isNew && lv === "90d") openGoal(id);
+    } catch (e) { showErr("goErr", writeErrMsg(e)); }
+  }
+  async function deleteGoal(){
+    if (!gDraft || !gDraft.id || !db) return;
+    var ids = [gDraft.id];
+    for (var i = 0; i < ids.length; i++) kids(ids[i]).forEach(function(c){ ids.push(c.id); });
+    var logs = S.glog.filter(function(l){ return ids.indexOf(l.goal) >= 0; });
+    if (!gDelArm) {
+      gDelArm = true;
+      $("goDelete").textContent = ids.length > 1 || logs.length ? "Pasti? Termasuk " + (ids.length - 1) + " sub-goal & " + logs.length + " catatan" : "Pasti padam?";
+      return;
+    }
+    try {
+      for (var j = 0; j < logs.length; j++) { var lid = logs[j].id; await withRetry(function(){ return db.doc("glog/" + lid).delete(); }); }
+      for (var k = ids.length - 1; k >= 0; k--) { var pid = ids[k]; await withRetry(function(){ return db.doc("plan/" + pid).delete(); }); }
+      if (ids.indexOf(S.pv.open) >= 0) S.pv.open = null;
+      hideDlg("goalDlg"); render(); toast("Goal dipadam");
+    } catch (e) { showErr("goErr", writeErrMsg(e)); }
+  }
+  function toggleGoalDone(id){
+    var g = planById(id); if (!g || !db || S.readOnly) return;
+    var body = planBody(Object.assign({}, g, {done:!g.done}));
+    withRetry(function(){ return db.doc("plan/" + id).set(body); }).then(function(){ toast(body.done ? "Tahniah! Goal tercapai 🎉" : "Tanda tercapai dibuang"); }).catch(function(e){ toast(writeErrMsg(e)); });
+  }
+
   /* ---------- events ---------- */
   function goView(k){ S.view = k; S.filter = null; S.confirmDel = null; render(); }
   function setupStatic(){
@@ -1600,6 +2241,20 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
     $("clearFilter").addEventListener("click", function(){ S.filter = null; render(); });
     $("csvBtn").addEventListener("click", exportCsv);
 
+    $("calForm").addEventListener("submit", saveCal);
+    $("calForm").addEventListener("change", function(ev){ if (ev.target.name === "calKind") calKindUi(); });
+    $("calDelete").addEventListener("click", deleteCal);
+    $("goalForm").addEventListener("submit", saveGoal);
+    $("goStart").addEventListener("input", goalDates);
+    $("goStart").addEventListener("change", goalDates);
+    $("goDelete").addEventListener("click", deleteGoal);
+    $("glogForm").addEventListener("submit", saveLog);
+    $("glDate").addEventListener("change", function(){ var g = planById(S.pv.open); if (g) fillLog(g, $("glDate").value); });
+    ["calDlg", "goalDlg"].forEach(function(id){
+      $(id).addEventListener("click", function(ev){ if (ev.target.closest("[data-close]")) hideDlg(id); });
+    });
+    $("agenda").addEventListener("change", function(ev){ var t = ev.target; if (t.matches("input[data-cal-done]")) setAgendaDone(t.dataset.calDone, t.checked); });
+
     $("today").addEventListener("change", function(ev){
       var t = ev.target; if (!t.matches('input[type="checkbox"][data-goal]') || S.readOnly) return;
       var day = S.goalDay, body = currentGoalBody(day), id = t.dataset.goal;
@@ -1617,8 +2272,10 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
       if (ev.target.id !== "addGoalForm") return;
       ev.preventDefault();
       var inp = $("gNew"), text = inp.value.trim(); if (!text || S.readOnly) return;
+      var slot = $("gSlot") ? $("gSlot").value : "";
+      if ($("gRep") && $("gRep").checked) { inp.value = ""; $("gRep").checked = false; addRecurringGoal(text, slot); return; }
       var day = S.goalDay, body = currentGoalBody(day);
-      body.extras.push({id:newId("x"), text:text.slice(0,80), done:false});
+      body.extras.push({id:newId("x"), text:text.slice(0,80), slot:slotById(slot) ? slot : "", done:false});
       inp.value = ""; saveGoalDay(day, body);
       if ($("gNew")) $("gNew").focus();
     });
@@ -1639,6 +2296,26 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
       else if (a === "tab") goTab(b.dataset.tab);
       else if (a === "quick-add") { goTab("belanja"); setTimeout(function(){ $("fAmount").focus(); }, 50); }
       else if (a === "rm-extra") { var day = S.goalDay, body = currentGoalBody(day); body.extras = body.extras.filter(function(x){ return x.id !== b.dataset.id; }); saveGoalDay(day, body); }
+      else if (a === "slot-add") { if ($("gSlot")) { $("gSlot").value = b.dataset.slot; $("gNew").focus(); } }
+      // calendar
+      else if (a === "cal-prev" || a === "cal-next") { S.cal.month = shiftKey(S.cal.month || todayStr().slice(0, 7), a === "cal-prev" ? -1 : 1); renderAgenda(); }
+      else if (a === "cal-today") { S.cal.month = todayStr().slice(0, 7); S.cal.sel = todayStr(); renderAgenda(); }
+      else if (a === "cal-day") { S.cal.sel = b.dataset.day; renderAgenda(); }
+      else if (a === "cal-add") openCal(null);
+      else if (a === "cal-edit") openCal(b.dataset.id);
+      // goals
+      else if (a === "g-new") openGoalDlg({level:b.dataset.level, parent:b.dataset.parent, year:b.dataset.y, q:b.dataset.q});
+      else if (a === "g-edit") openGoalDlg({id:b.dataset.id});
+      else if (a === "g-root") { S.pv.root = b.dataset.id; S.pv.year = null; S.pv.q = null; S.pv.open = null; render(); }
+      else if (a === "g-year") { S.pv.year = Number(b.dataset.y); S.pv.q = null; render(); }
+      else if (a === "g-q") { S.pv.q = Number(b.dataset.q); render(); }
+      else if (a === "g-open") openGoal(b.dataset.id, b.dataset.date);
+      else if (a === "g-back") { S.pv.open = null; S.pv.delLog = null; render(); window.scrollTo(0, 0); }
+      else if (a === "g-done") toggleGoalDone(b.dataset.id);
+      else if (a === "gl-edit") { var og = planById(S.pv.open); if (og) { fillLog(og, b.dataset.date); $("glogPanel").scrollIntoView({behavior:"smooth", block:"start"}); } }
+      else if (a === "gl-del") { S.pv.delLog = b.dataset.id; render(); }
+      else if (a === "gl-del-no") { S.pv.delLog = null; render(); }
+      else if (a === "gl-del-yes") { var lid = b.dataset.id; S.pv.delLog = null; if (db) withRetry(function(){ return db.doc("glog/" + lid).delete(); }).then(function(){ toast("Catatan dipadam"); var og2 = planById(S.pv.open); if (og2) fillLog(og2, $("glDate").value); }).catch(function(e){ toast(writeErrMsg(e)); }); }
     });
 
     renderRecipes();
@@ -1648,7 +2325,12 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
 
     // roll over at midnight
     var lastDay = todayStr();
-    setInterval(function(){ var t = todayStr(); if (t !== lastDay) { if (S.goalDay === lastDay) S.goalDay = t; lastDay = t; render(); } }, 60000);
+    var lastSlot = slotNow();
+    setInterval(function(){
+      var t = todayStr(), sl = slotNow();
+      if (t !== lastDay) { if (S.goalDay === lastDay) S.goalDay = t; if (S.cal.sel === lastDay) S.cal.sel = t; lastDay = t; lastSlot = sl; render(); }
+      else if (sl !== lastSlot) { lastSlot = sl; renderToday(); }
+    }, 60000);
   }
 
   function subscribe(){
@@ -1682,6 +2364,30 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar{display:none}
       if (!snap.metadata.fromCache) done("g");
       render();
     }, fail("g"));
+    db.collection("agenda").onSnapshot(function(snap){
+      S.agenda = snap.docs.map(function(d){
+        var x = d.data() || {};
+        return {id:d.id, kind:CAL_KINDS[x.kind] ? x.kind : "tugas", title:String(x.title || ""), date:String(x.date || ""), end:String(x.end || ""), time:String(x.time || ""),
+          note:String(x.note || ""), done:!!x.done, createdAt:x.createdAt || "", updatedAt:x.updatedAt || ""};
+      }).filter(function(a){ return isDate(a.date) && a.title; });
+      render();
+    }, function(){});
+    db.collection("plan").onSnapshot(function(snap){
+      S.plan = snap.docs.map(function(d){
+        var x = d.data() || {};
+        return {id:d.id, level:LEVELS[x.level] ? x.level : "", parent:String(x.parent || ""), title:String(x.title || ""), why:String(x.why || ""), done:!!x.done,
+          start:String(x.start || ""), year:Math.min(Math.max(Number(x.year) || 0, 0), 2), q:Math.min(Math.max(Number(x.q) || 0, 0), 3), createdAt:x.createdAt || "", updatedAt:x.updatedAt || ""};
+      }).filter(function(g){ return g.level && g.title; });
+      render();
+    }, function(){});
+    db.collection("glog").onSnapshot(function(snap){
+      S.glog = snap.docs.map(function(d){
+        var x = d.data() || {};
+        return {id:d.id, goal:String(x.goal || ""), date:String(x.date || ""), learn:String(x.learn || ""), tried:String(x.tried || ""),
+          rating:Math.min(Math.max(Math.round(Number(x.rating) || 0), 0), 5), createdAt:x.createdAt || "", updatedAt:x.updatedAt || ""};
+      }).filter(function(l){ return l.goal && isDate(l.date); });
+      render();
+    }, function(){});
   }
 
   async function init(){
