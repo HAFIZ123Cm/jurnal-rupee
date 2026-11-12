@@ -988,8 +988,10 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
       {id:"transport", name:"Pengangkutan",             alloc:400},
       {id:"belajar",   name:"Buku & pelajaran",         alloc:500},
       {id:"hiburan",   name:"Hiburan & jalan-jalan",    alloc:500},
-      {id:"lain",      name:"Lain-lain",                alloc:800},
-      {id:"simpanan",  name:"Simpanan",                 alloc:2600}
+      {id:"lain",      name:"Lain-lain",                alloc:300},
+      {id:"kecemasan", name:"Kecemasan (hal luar jangka)", alloc:1000},
+      {id:"kemahuan",  name:"Kemahuan",                 alloc:500},
+      {id:"simpanan",  name:"Simpanan",                 alloc:1600}
     ],
     dailyGoals: [
       {id:"g1", text:"Masak sendiri: ayam + nasi", slot:"tengahari"},
@@ -1800,6 +1802,30 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
     catch (e) { if (e && e.code === "declined") return; if (e && e.code === "rate_limited") { toast("Tetingkap simpan sudah dibuka. Cuba lagi sebentar."); return; } toast("Muat turun tidak tersedia di sini."); }
   }
 
+  /* ---------- one-time: add Kecemasan + Kemahuan categories (13 Nov 2026) ---------- */
+  // Kecemasan takes ₹1,000 from Simpanan, Kemahuan takes ₹500 from Lain-lain, so the total stays the same.
+  // A marker doc stops it from running again, so deleting a category later sticks.
+  var catsChecked = false;
+  function ensureNewCats(){
+    if (catsChecked || !db || S.readOnly || !S.settings) return;
+    catsChecked = true;
+    var ref = db.doc("meta/kategori-2026-11");
+    ref.get().then(function(snap){
+      if (snap.exists) return;
+      var s = S.settings, cats = s.categories.map(function(c){ return {id:c.id, name:c.name, alloc:c.alloc}; });
+      function has(id){ return cats.some(function(c){ return c.id === id; }); }
+      function take(id, n){ var c = cats.find(function(x){ return x.id === id; }); if (!c) return 0; var t = Math.max(0, Math.min(c.alloc, n)); c.alloc -= t; return t; }
+      var added = [];
+      if (!has("kecemasan")) added.push({id:"kecemasan", name:"Kecemasan (hal luar jangka)", alloc:take("simpanan", 1000)});
+      if (!has("kemahuan")) added.push({id:"kemahuan", name:"Kemahuan", alloc:take("lain", 500)});
+      var at = cats.findIndex(function(c){ return c.id === "simpanan"; }); if (at < 0) at = cats.length;
+      Array.prototype.splice.apply(cats, [at, 0].concat(added));
+      var p = added.length ? withRetry(function(){ return db.doc("settings/main").set(settingsBody({budget:s.budget, cycleStartDay:s.cycleStartDay, categories:cats, dailyGoals:s.dailyGoals, balance:s.balance})); }) : Promise.resolve();
+      return p.then(function(){ return ref.set({done:true, at:new Date().toISOString()}); })
+        .then(function(){ if (added.length) toast("Kategori baru ditambah: Kecemasan & Kemahuan"); });
+    }).catch(function(){ catsChecked = false; });
+  }
+
   /* ---------- small dialog helpers ---------- */
   function showDlg(id){ var d = $(id); if (typeof d.showModal === "function") { if (!d.open) d.showModal(); } else d.setAttribute("open", ""); }
   function hideDlg(id){ var d = $(id); if (d.open) { if (d.close) d.close(); else d.removeAttribute("open"); } }
@@ -2443,7 +2469,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
       var prevStart = S.settings ? S.settings.cycleStartDay : null;
       if (snap.exists) S.settings = normalizeSettings(snap.data()); else if (!snap.metadata.fromCache) S.settings = null;
       if (S.settings && prevStart !== null && prevStart !== S.settings.cycleStartDay) { S.view = null; S.formCycle = null; }
-      if (!snap.metadata.fromCache) done("s");
+      if (!snap.metadata.fromCache) { done("s"); ensureNewCats(); }
       render();
     }, fail("s"));
     db.collection("expenses").onSnapshot(function(snap){
