@@ -977,22 +977,21 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
   var MON_SHORT = ["Jan","Feb","Mac","Apr","Mei","Jun","Jul","Ogo","Sep","Okt","Nov","Dis"];
   var DAYS = ["Ahad","Isnin","Selasa","Rabu","Khamis","Jumaat","Sabtu"];
   var DAYS_SHORT = ["Ah","Is","Se","Ra","Kh","Ju","Sa"];
+  // Category layout chosen on 13 Nov 2026 (total ₹20,000)
+  var NEW_CATS = [
+    {id:"makanan",   name:"Makanan & barang dapur",      alloc:10000},
+    {id:"kesihatan", name:"Kesihatan",                   alloc:2550},
+    {id:"claude",    name:"Claude",                      alloc:2000},
+    {id:"elektrik",  name:"Bil elektrik",                alloc:800},
+    {id:"telefon",   name:"Telefon & internet",          alloc:300},
+    {id:"transport", name:"Pengangkutan",                alloc:300},
+    {id:"kemahuan",  name:"Kemahuan",                    alloc:2000},
+    {id:"kecemasan", name:"Kecemasan (hal luar jangka)", alloc:2050}
+  ];
+  var CAT_MOVE = {barang:"makanan", hiburan:"kemahuan"};
   var TEMPLATE = {
     budget: 20000, cycleStartDay: 20,
-    categories: [
-      {id:"barang",    name:"Barang dapur & keperluan", alloc:6700},
-      {id:"makanan",   name:"Makanan & minuman",        alloc:3500},
-      {id:"kesihatan", name:"Kesihatan",                alloc:2700},
-      {id:"claude",    name:"Claude",                   alloc:2000},
-      {id:"telefon",   name:"Telefon & internet",       alloc:300},
-      {id:"transport", name:"Pengangkutan",             alloc:400},
-      {id:"belajar",   name:"Buku & pelajaran",         alloc:500},
-      {id:"hiburan",   name:"Hiburan & jalan-jalan",    alloc:500},
-      {id:"lain",      name:"Lain-lain",                alloc:300},
-      {id:"kecemasan", name:"Kecemasan (hal luar jangka)", alloc:1000},
-      {id:"kemahuan",  name:"Kemahuan",                 alloc:500},
-      {id:"simpanan",  name:"Simpanan",                 alloc:1600}
-    ],
+    categories: NEW_CATS.map(function(c){ return {id:c.id, name:c.name, alloc:c.alloc}; }),
     dailyGoals: [
       {id:"g1", text:"Masak sendiri: ayam + nasi", slot:"tengahari"},
       {id:"g4", text:"Belajar / ulang kaji", slot:"petang"},
@@ -1802,27 +1801,25 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
     catch (e) { if (e && e.code === "declined") return; if (e && e.code === "rate_limited") { toast("Tetingkap simpan sudah dibuka. Cuba lagi sebentar."); return; } toast("Muat turun tidak tersedia di sini."); }
   }
 
-  /* ---------- one-time: add Kecemasan + Kemahuan categories (13 Nov 2026) ---------- */
-  // Kecemasan takes ₹1,000 from Simpanan, Kemahuan takes ₹500 from Lain-lain, so the total stays the same.
-  // A marker doc stops it from running again, so deleting a category later sticks.
-  var catsChecked = false;
+  /* ---------- one-time: new category layout (13 Nov 2026) ---------- */
+  // Replaces the categories with NEW_CATS and moves old records: Barang dapur → Makanan & barang dapur, Hiburan → Kemahuan.
+  // Other old categories keep their records (shown as "(lama)"). A marker doc stops it from running twice.
+  var catsChecked = false, expLoaded = false;
   function ensureNewCats(){
-    if (catsChecked || !db || S.readOnly || !S.settings) return;
+    if (catsChecked || !db || S.readOnly || !S.settings || !expLoaded) return;
     catsChecked = true;
-    var ref = db.doc("meta/kategori-2026-11");
-    ref.get().then(function(snap){
+    var ref = db.doc("meta/kategori-2026-11b");
+    ref.get().then(async function(snap){
       if (snap.exists) return;
-      var s = S.settings, cats = s.categories.map(function(c){ return {id:c.id, name:c.name, alloc:c.alloc}; });
-      function has(id){ return cats.some(function(c){ return c.id === id; }); }
-      function take(id, n){ var c = cats.find(function(x){ return x.id === id; }); if (!c) return 0; var t = Math.max(0, Math.min(c.alloc, n)); c.alloc -= t; return t; }
-      var added = [];
-      if (!has("kecemasan")) added.push({id:"kecemasan", name:"Kecemasan (hal luar jangka)", alloc:take("simpanan", 1000)});
-      if (!has("kemahuan")) added.push({id:"kemahuan", name:"Kemahuan", alloc:take("lain", 500)});
-      var at = cats.findIndex(function(c){ return c.id === "simpanan"; }); if (at < 0) at = cats.length;
-      Array.prototype.splice.apply(cats, [at, 0].concat(added));
-      var p = added.length ? withRetry(function(){ return db.doc("settings/main").set(settingsBody({budget:s.budget, cycleStartDay:s.cycleStartDay, categories:cats, dailyGoals:s.dailyGoals, balance:s.balance})); }) : Promise.resolve();
-      return p.then(function(){ return ref.set({done:true, at:new Date().toISOString()}); })
-        .then(function(){ if (added.length) toast("Kategori baru ditambah: Kecemasan & Kemahuan"); });
+      var s = S.settings, cats = NEW_CATS.map(function(c){ return {id:c.id, name:c.name, alloc:c.alloc}; });
+      await withRetry(function(){ return db.doc("settings/main").set(settingsBody({budget:s.budget, cycleStartDay:s.cycleStartDay, categories:cats, dailyGoals:s.dailyGoals, balance:s.balance})); });
+      var moves = S.expenses.filter(function(e){ return CAT_MOVE[e.cat]; });
+      for (var i = 0; i < moves.length; i++) {
+        var e = moves[i], to = CAT_MOVE[e.cat], nm = NEW_CATS.find(function(c){ return c.id === to; }).name;
+        await withRetry(function(){ return db.doc("expenses/" + e.id).update({cat:to, catName:nm}); });
+      }
+      await ref.set({done:true, at:new Date().toISOString(), moved:moves.length});
+      toast("Kategori disusun semula (jumlah ₹20,000)");
     }).catch(function(){ catsChecked = false; });
   }
 
@@ -2478,7 +2475,7 @@ body[data-tab="muzik"] .cyclebar,body[data-tab="jurnal"] .cyclebar,body[data-tab
         return {id:d.id, date:String(x.date || ""), cat:String(x.cat || ""), catName:x.catName || "", amount:Number(x.amount) || 0, note:x.note || "",
           method:x.method || "", createdAt:x.createdAt || "", source:x.source || "", txnId:x.txnId || ""};
       }).filter(function(e){ return /^\d{4}-\d{2}-\d{2}$/.test(e.date); });
-      if (!snap.metadata.fromCache) done("e");
+      if (!snap.metadata.fromCache) { done("e"); expLoaded = true; ensureNewCats(); }
       render();
     }, fail("e"));
     db.collection("goals").onSnapshot(function(snap){
